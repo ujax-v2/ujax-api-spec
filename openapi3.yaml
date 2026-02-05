@@ -1,0 +1,116 @@
+openapi: 3.0.1
+info:
+  title: ujax API
+  description: 백준 알고리즘 스터디 프로젝트 백엔드 API
+  version: 0.0.1-SNAPSHOT
+servers:
+- url: http://localhost:8080
+tags: []
+paths:
+  /api/v1/users/me:
+    get:
+      tags:
+      - User
+      summary: 내 정보 조회
+      description: 로그인한 사용자의 정보를 조회합니다
+      operationId: user-get-me
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+              examples:
+                user-get-me:
+                  value: |-
+                    {
+                      "id" : 1,
+                      "email" : "test@example.com",
+                      "name" : "테스트유저",
+                      "profileImageUrl" : "https://example.com/profile.jpg",
+                      "provider" : "GOOGLE"
+                    }
+    delete:
+      tags:
+      - User
+      summary: 회원 탈퇴
+      description: 로그인한 사용자의 계정을 삭제합니다
+      operationId: user-delete-me
+      responses:
+        "204":
+          description: "204"
+    patch:
+      tags:
+      - User
+      summary: 내 정보 수정
+      description: 로그인한 사용자의 정보를 수정합니다
+      operationId: user-update-me
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+            examples:
+              user-update-me:
+                value: |-
+                  {
+                    "name" : "수정된이름",
+                    "profileImageUrl" : "https://example.com/new-profile.jpg"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+              examples:
+                user-update-me:
+                  value: |-
+                    {
+                      "id" : 1,
+                      "email" : "test@example.com",
+                      "name" : "수정된이름",
+                      "profileImageUrl" : "https://example.com/profile.jpg",
+                      "provider" : "GOOGLE"
+                    }
+components:
+  schemas:
+    UserResponse:
+      title: UserResponse
+      required:
+      - email
+      - id
+      - name
+      - provider
+      type: object
+      properties:
+        provider:
+          type: string
+          description: "인증 제공자 (GOOGLE, KAKAO, LOCAL)"
+        name:
+          type: string
+          description: 이름
+        id:
+          type: number
+          description: 유저 ID
+        profileImageUrl:
+          type: string
+          description: 프로필 이미지 URL
+          nullable: true
+        email:
+          type: string
+          description: 이메일
+    UserUpdateRequest:
+      title: UserUpdateRequest
+      type: object
+      properties:
+        name:
+          type: string
+          description: 수정할 이름 (30자 이내)
+          nullable: true
+        profileImageUrl:
+          type: string
+          description: 수정할 프로필 이미지 URL
+          nullable: true

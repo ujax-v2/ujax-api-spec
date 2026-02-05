@@ -1,0 +1,30 @@
+{
+  "name": "@ujax/api-spec",
+  "version": "0.0.1",
+  "description": "ujax API OpenAPI 스펙 및 TypeScript 타입",
+  "main": "index.js",
+  "types": "types.ts",
+  "files": [
+    "openapi3.yaml",
+    "types.ts",
+    "index.js"
+  ],
+  "scripts": {
+    "generate": "openapi-typescript openapi3.yaml -o types.ts",
+    "prepublishOnly": "npm run generate"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.4.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ujax/ujax-api-spec.git"
+  },
+  "keywords": [
+    "ujax",
+    "api",
+    "openapi",
+    "typescript"
+  ],
+  "license": "MIT"
+}
