@@ -590,28 +590,52 @@ export interface components {
             name?: string;
         };
         SubmissionResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            baekjoonSubmissionId?: number;
-            problemNumber?: number;
-            username?: string;
-            verdict?: string;
+            /**
+             * Format: int64
+             * @description 제출 ID
+             */
+            id: number;
+            /**
+             * Format: int64
+             * @description 백준 제출 ID
+             */
+            baekjoonSubmissionId: number;
+            /** @description 백준 문제 번호 */
+            problemNumber: number;
+            /** @description 백준 사용자명 */
+            username: string;
+            /** @description 채점 결과 (맞았습니다!!, 틀렸습니다, 시간 초과 등) */
+            verdict: string;
+            /** @description 실행 시간 */
             executionTime?: string | null;
+            /** @description 메모리 사용량 */
             memory?: string | null;
+            /** @description 프로그래밍 언어 */
             language?: string | null;
+            /** @description 코드 길이 */
             codeLength?: string | null;
         };
         SubmissionIngestRequest: {
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description 백준 제출 ID
+             */
             submissionId: number;
+            /** @description 백준 문제 번호 */
             problemNum: number;
+            /** @description 백준 사용자명 */
             username: string;
+            /** @description 채점 결과 */
             verdict: string;
+            /** @description 실행 시간 */
             time?: string | null;
+            /** @description 메모리 사용량 */
             memory?: string | null;
+            /** @description 프로그래밍 언어 */
             language?: string | null;
+            /** @description 코드 길이 */
             codeLength?: string | null;
+            /** @description 소스 코드 */
             code?: string | null;
         };
     };
