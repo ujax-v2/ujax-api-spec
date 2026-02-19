@@ -698,6 +698,10 @@ components:
         provider:
           type: string
           description: "인증 제공자 (GOOGLE, KAKAO, LOCAL)"
+        baekjoonId:
+          type: string
+          description: 백준 아이디
+          nullable: true
 
     UserUpdateRequest:
       type: object
@@ -709,6 +713,10 @@ components:
         profileImageUrl:
           type: string
           description: 수정할 프로필 이미지 URL
+          nullable: true
+        baekjoonId:
+          type: string
+          description: 백준 아이디
           nullable: true
 
     # ──── Workspace ────
