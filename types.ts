@@ -458,12 +458,16 @@ export interface components {
             profileImageUrl?: string | null;
             /** @description 인증 제공자 (GOOGLE, KAKAO, LOCAL) */
             provider: string;
+            /** @description 백준 아이디 */
+            baekjoonId?: string | null;
         };
         UserUpdateRequest: {
             /** @description 수정할 이름 (30자 이내) */
             name?: string | null;
             /** @description 수정할 프로필 이미지 URL */
             profileImageUrl?: string | null;
+            /** @description 백준 아이디 */
+            baekjoonId?: string | null;
         };
         WorkspaceResponse: {
             /**
