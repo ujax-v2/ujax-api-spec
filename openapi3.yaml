@@ -2,15 +2,89 @@ openapi: 3.0.1
 info:
   title: ujax API
   description: 백준 알고리즘 스터디 프로젝트 백엔드 API
-  version: 0.0.1-SNAPSHOT
+  version: 0.0.2-SNAPSHOT
 servers:
 - url: http://localhost:8080
-tags: []
+tags:
+- name: Auth
+- name: User
+- name: Workspace
+- name: Problem
+- name: Submission
 paths:
+  # ──────────────── Auth ────────────────
+  /api/v1/auth/signup:
+    post:
+      tags: [Auth]
+      summary: 회원가입
+      operationId: auth-signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAuthTokenResponse"
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: 로그인
+      operationId: auth-login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAuthTokenResponse"
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: 토큰 갱신
+      operationId: auth-refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAuthTokenResponse"
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: 로그아웃
+      operationId: auth-logout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: "200"
+
+  # ──────────────── User ────────────────
   /api/v1/users/me:
     get:
-      tags:
-      - User
+      tags: [User]
       summary: 내 정보 조회
       description: 로그인한 사용자의 정보를 조회합니다
       operationId: user-get-me
@@ -20,90 +94,612 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserResponse"
-              examples:
-                user-get-me:
-                  value: |-
-                    {
-                      "id" : 1,
-                      "email" : "test@example.com",
-                      "name" : "테스트유저",
-                      "profileImageUrl" : "https://example.com/profile.jpg",
-                      "provider" : "GOOGLE"
-                    }
-    delete:
-      tags:
-      - User
-      summary: 회원 탈퇴
-      description: 로그인한 사용자의 계정을 삭제합니다
-      operationId: user-delete-me
-      responses:
-        "204":
-          description: "204"
+                $ref: "#/components/schemas/ApiResponseUserResponse"
     patch:
-      tags:
-      - User
+      tags: [User]
       summary: 내 정보 수정
       description: 로그인한 사용자의 정보를 수정합니다
       operationId: user-update-me
       requestBody:
         content:
-          application/json;charset=UTF-8:
+          application/json:
             schema:
               $ref: "#/components/schemas/UserUpdateRequest"
-            examples:
-              user-update-me:
-                value: |-
-                  {
-                    "name" : "수정된이름",
-                    "profileImageUrl" : "https://example.com/new-profile.jpg"
-                  }
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserResponse"
-              examples:
-                user-update-me:
-                  value: |-
-                    {
-                      "id" : 1,
-                      "email" : "test@example.com",
-                      "name" : "수정된이름",
-                      "profileImageUrl" : "https://example.com/profile.jpg",
-                      "provider" : "GOOGLE"
-                    }
+                $ref: "#/components/schemas/ApiResponseUserResponse"
+    delete:
+      tags: [User]
+      summary: 회원 탈퇴
+      description: 로그인한 사용자의 계정을 삭제합니다
+      operationId: user-delete-me
+      responses:
+        "204":
+          description: "204"
+
+  # ──────────────── Workspace ────────────────
+  /api/v1/workspaces:
+    get:
+      tags: [Workspace]
+      summary: 내 워크스페이스 목록 조회
+      operationId: workspace-list
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseWorkspaceListResponse"
+    post:
+      tags: [Workspace]
+      summary: 워크스페이스 생성
+      operationId: workspace-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkspaceRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseWorkspaceResponse"
+
+  /api/v1/workspaces/explore:
+    get:
+      tags: [Workspace]
+      summary: 워크스페이스 탐색 (공개)
+      operationId: workspace-explore
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 12
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponsePageResponseWorkspaceResponse"
+
+  /api/v1/workspaces/search:
+    get:
+      tags: [Workspace]
+      summary: 워크스페이스 검색
+      operationId: workspace-search
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 12
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponsePageResponseWorkspaceResponse"
+
+  /api/v1/workspaces/{workspaceId}:
+    get:
+      tags: [Workspace]
+      summary: 워크스페이스 상세 조회
+      operationId: workspace-get
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseWorkspaceResponse"
+    patch:
+      tags: [Workspace]
+      summary: 워크스페이스 수정
+      operationId: workspace-update
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkspaceRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseWorkspaceResponse"
+    delete:
+      tags: [Workspace]
+      summary: 워크스페이스 삭제
+      operationId: workspace-delete
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "204"
+
+  /api/v1/workspaces/{workspaceId}/settings:
+    get:
+      tags: [Workspace]
+      summary: 워크스페이스 설정 조회
+      operationId: workspace-get-settings
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseWorkspaceSettingsResponse"
+
+  /api/v1/workspaces/{workspaceId}/members:
+    get:
+      tags: [Workspace]
+      summary: 워크스페이스 멤버 목록 조회
+      operationId: workspace-member-list
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseWorkspaceMemberListResponse"
+
+  /api/v1/workspaces/{workspaceId}/members/me:
+    get:
+      tags: [Workspace]
+      summary: 워크스페이스 내 멤버 정보 조회
+      operationId: workspace-member-get-me
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseWorkspaceMemberResponse"
+    delete:
+      tags: [Workspace]
+      summary: 워크스페이스 탈퇴
+      operationId: workspace-member-leave
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "204"
+
+  /api/v1/workspaces/{workspaceId}/members/me/nickname:
+    patch:
+      tags: [Workspace]
+      summary: 워크스페이스 닉네임 변경
+      operationId: workspace-member-update-nickname
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkspaceMemberNicknameRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseWorkspaceMemberResponse"
+
+  /api/v1/workspaces/{workspaceId}/members/invite:
+    post:
+      tags: [Workspace]
+      summary: 워크스페이스 멤버 초대
+      operationId: workspace-member-invite
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteWorkspaceMemberRequest"
+      responses:
+        "200":
+          description: "200"
+
+  /api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}/role:
+    patch:
+      tags: [Workspace]
+      summary: 멤버 역할 변경
+      operationId: workspace-member-update-role
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: workspaceMemberId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkspaceMemberRoleRequest"
+      responses:
+        "200":
+          description: "200"
+
+  /api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}:
+    delete:
+      tags: [Workspace]
+      summary: 멤버 강퇴
+      operationId: workspace-member-remove
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: workspaceMemberId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "204"
+
+  # ──────────────── Problem ────────────────
+  /api/v1/problems/{problemId}:
+    get:
+      tags: [Problem]
+      summary: 문제 조회 (ID)
+      operationId: problem-get-by-id
+      parameters:
+        - name: problemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseProblemResponse"
+
+  /api/v1/problems/number/{problemNumber}:
+    get:
+      tags: [Problem]
+      summary: 문제 조회 (백준 번호)
+      operationId: problem-get-by-number
+      parameters:
+        - name: problemNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseProblemResponse"
+
+  /api/v1/problems/ingest:
+    post:
+      tags: [Problem]
+      summary: 문제 수집 (익스텐션)
+      operationId: problem-ingest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProblemIngestRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseProblemResponse"
+
+  # ──────────────── Submission ────────────────
+  /api/v1/submissions/{submissionId}:
+    get:
+      tags: [Submission]
+      summary: 제출 조회
+      operationId: submission-get
+      parameters:
+        - name: submissionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseSubmissionResponse"
+
+  /api/v1/submissions/ingest:
+    post:
+      tags: [Submission]
+      summary: 제출 수집 (익스텐션)
+      operationId: submission-ingest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmissionIngestRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseSubmissionResponse"
+
 components:
   schemas:
-    UserResponse:
-      title: UserResponse
-      required:
-      - email
-      - id
-      - name
-      - provider
+    # ──── Generic Wrapper ────
+    ApiResponseAuthTokenResponse:
       type: object
       properties:
-        provider:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/AuthTokenResponse"
+        message:
           type: string
-          description: "인증 제공자 (GOOGLE, KAKAO, LOCAL)"
+          nullable: true
+
+    ApiResponseUserResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/UserResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseWorkspaceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/WorkspaceResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseWorkspaceListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/WorkspaceListResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseWorkspaceSettingsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/WorkspaceSettingsResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseWorkspaceMemberResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/WorkspaceMemberResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseWorkspaceMemberListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/WorkspaceMemberListResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponsePageResponseWorkspaceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/PageResponseWorkspaceResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseProblemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/ProblemResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseSubmissionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/SubmissionResponse"
+        message:
+          type: string
+          nullable: true
+
+    # ──── Auth ────
+    SignupRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
         name:
           type: string
-          description: 이름
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    RefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+
+    AuthTokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+
+    # ──── User ────
+    UserResponse:
+      type: object
+      required: [id, email, name, provider]
+      properties:
         id:
           type: number
           description: 유저 ID
+        email:
+          type: string
+          description: 이메일
+        name:
+          type: string
+          description: 이름
         profileImageUrl:
           type: string
           description: 프로필 이미지 URL
           nullable: true
-        email:
+        provider:
           type: string
-          description: 이메일
+          description: "인증 제공자 (GOOGLE, KAKAO, LOCAL)"
+
     UserUpdateRequest:
-      title: UserUpdateRequest
       type: object
       properties:
         name:
@@ -113,4 +709,311 @@ components:
         profileImageUrl:
           type: string
           description: 수정할 프로필 이미지 URL
+          nullable: true
+
+    # ──── Workspace ────
+    WorkspaceResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 워크스페이스 ID
+        name:
+          type: string
+          description: 워크스페이스 이름
+        description:
+          type: string
+          description: 워크스페이스 설명
+          nullable: true
+
+    WorkspaceListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkspaceResponse"
+
+    WorkspaceSettingsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        mmWebhookUrl:
+          type: string
+          description: Mattermost Webhook URL
+          nullable: true
+
+    WorkspaceMemberResponse:
+      type: object
+      properties:
+        workspaceMemberId:
+          type: integer
+          format: int64
+          description: 워크스페이스 멤버 ID
+        nickname:
+          type: string
+          description: 워크스페이스 내 닉네임
+        role:
+          type: string
+          description: "멤버 역할 (OWNER, ADMIN, MEMBER)"
+          enum: [OWNER, ADMIN, MEMBER]
+
+    WorkspaceMemberListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkspaceMemberResponse"
+
+    PageResponseWorkspaceResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkspaceResponse"
+        page:
+          $ref: "#/components/schemas/PageInfo"
+
+    PageInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+
+    CreateWorkspaceRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: 워크스페이스 이름
+        description:
+          type: string
+          description: 워크스페이스 설명
+          nullable: true
+
+    UpdateWorkspaceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        mmWebhookUrl:
+          type: string
+          nullable: true
+
+    InviteWorkspaceMemberRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          description: 초대할 사용자 이메일
+
+    UpdateWorkspaceMemberNicknameRequest:
+      type: object
+      required: [nickname]
+      properties:
+        nickname:
+          type: string
+          description: 변경할 닉네임
+
+    UpdateWorkspaceMemberRoleRequest:
+      type: object
+      required: [role]
+      properties:
+        role:
+          type: string
+          enum: [OWNER, ADMIN, MEMBER]
+          description: 변경할 역할
+
+    # ──── Problem ────
+    ProblemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        problemNumber:
+          type: integer
+          description: 백준 문제 번호
+        title:
+          type: string
+        tier:
+          type: string
+          nullable: true
+        timeLimit:
+          type: string
+          nullable: true
+        memoryLimit:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        inputDescription:
+          type: string
+          nullable: true
+        outputDescription:
+          type: string
+          nullable: true
+        url:
+          type: string
+          nullable: true
+        samples:
+          type: array
+          items:
+            $ref: "#/components/schemas/SampleResponse"
+        algorithmTags:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlgorithmTagResponse"
+
+    SampleResponse:
+      type: object
+      properties:
+        sampleIndex:
+          type: integer
+        input:
+          type: string
+        output:
+          type: string
+
+    AlgorithmTagResponse:
+      type: object
+      properties:
+        name:
+          type: string
+
+    ProblemIngestRequest:
+      type: object
+      required: [problemNum, title]
+      properties:
+        problemNum:
+          type: integer
+        title:
+          type: string
+        tier:
+          type: string
+          nullable: true
+        timeLimit:
+          type: string
+          nullable: true
+        memoryLimit:
+          type: string
+          nullable: true
+        problemDesc:
+          type: string
+          nullable: true
+        problemInput:
+          type: string
+          nullable: true
+        problemOutput:
+          type: string
+          nullable: true
+        url:
+          type: string
+          nullable: true
+        samples:
+          type: array
+          items:
+            $ref: "#/components/schemas/SampleDto"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/TagDto"
+
+    SampleDto:
+      type: object
+      properties:
+        sampleIndex:
+          type: integer
+        input:
+          type: string
+        output:
+          type: string
+
+    TagDto:
+      type: object
+      properties:
+        name:
+          type: string
+
+    # ──── Submission ────
+    SubmissionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        baekjoonSubmissionId:
+          type: integer
+          format: int64
+        problemNumber:
+          type: integer
+        username:
+          type: string
+        verdict:
+          type: string
+        executionTime:
+          type: string
+          nullable: true
+        memory:
+          type: string
+          nullable: true
+        language:
+          type: string
+          nullable: true
+        codeLength:
+          type: string
+          nullable: true
+
+    SubmissionIngestRequest:
+      type: object
+      required: [submissionId, problemNum, username, verdict]
+      properties:
+        submissionId:
+          type: integer
+          format: int64
+        problemNum:
+          type: integer
+        username:
+          type: string
+        verdict:
+          type: string
+        time:
+          type: string
+          nullable: true
+        memory:
+          type: string
+          nullable: true
+        language:
+          type: string
+          nullable: true
+        codeLength:
+          type: string
+          nullable: true
+        code:
+          type: string
           nullable: true

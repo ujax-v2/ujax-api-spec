@@ -4,6 +4,74 @@
  */
 
 export interface paths {
+    "/api/v1/auth/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 회원가입 */
+        post: operations["auth-signup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 로그인 */
+        post: operations["auth-login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 토큰 갱신 */
+        post: operations["auth-refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 로그아웃 */
+        post: operations["auth-logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me": {
         parameters: {
             query?: never;
@@ -32,29 +100,519 @@ export interface paths {
         patch: operations["user-update-me"];
         trace?: never;
     };
+    "/api/v1/workspaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 워크스페이스 목록 조회 */
+        get: operations["workspace-list"];
+        put?: never;
+        /** 워크스페이스 생성 */
+        post: operations["workspace-create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/explore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 워크스페이스 탐색 (공개) */
+        get: operations["workspace-explore"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 워크스페이스 검색 */
+        get: operations["workspace-search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 워크스페이스 상세 조회 */
+        get: operations["workspace-get"];
+        put?: never;
+        post?: never;
+        /** 워크스페이스 삭제 */
+        delete: operations["workspace-delete"];
+        options?: never;
+        head?: never;
+        /** 워크스페이스 수정 */
+        patch: operations["workspace-update"];
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 워크스페이스 설정 조회 */
+        get: operations["workspace-get-settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 워크스페이스 멤버 목록 조회 */
+        get: operations["workspace-member-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/members/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 워크스페이스 내 멤버 정보 조회 */
+        get: operations["workspace-member-get-me"];
+        put?: never;
+        post?: never;
+        /** 워크스페이스 탈퇴 */
+        delete: operations["workspace-member-leave"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/members/me/nickname": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 워크스페이스 닉네임 변경 */
+        patch: operations["workspace-member-update-nickname"];
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/members/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 워크스페이스 멤버 초대 */
+        post: operations["workspace-member-invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 멤버 역할 변경 */
+        patch: operations["workspace-member-update-role"];
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 멤버 강퇴 */
+        delete: operations["workspace-member-remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/problems/{problemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 문제 조회 (ID) */
+        get: operations["problem-get-by-id"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/problems/number/{problemNumber}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 문제 조회 (백준 번호) */
+        get: operations["problem-get-by-number"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/problems/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 문제 수집 (익스텐션) */
+        post: operations["problem-ingest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/submissions/{submissionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 제출 조회 */
+        get: operations["submission-get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/submissions/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 제출 수집 (익스텐션) */
+        post: operations["submission-ingest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** UserResponse */
-        UserResponse: {
-            /** @description 인증 제공자 (GOOGLE, KAKAO, LOCAL) */
-            provider: string;
-            /** @description 이름 */
+        ApiResponseAuthTokenResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AuthTokenResponse"];
+            message?: string | null;
+        };
+        ApiResponseUserResponse: {
+            success?: boolean;
+            data?: components["schemas"]["UserResponse"];
+            message?: string | null;
+        };
+        ApiResponseWorkspaceResponse: {
+            success?: boolean;
+            data?: components["schemas"]["WorkspaceResponse"];
+            message?: string | null;
+        };
+        ApiResponseWorkspaceListResponse: {
+            success?: boolean;
+            data?: components["schemas"]["WorkspaceListResponse"];
+            message?: string | null;
+        };
+        ApiResponseWorkspaceSettingsResponse: {
+            success?: boolean;
+            data?: components["schemas"]["WorkspaceSettingsResponse"];
+            message?: string | null;
+        };
+        ApiResponseWorkspaceMemberResponse: {
+            success?: boolean;
+            data?: components["schemas"]["WorkspaceMemberResponse"];
+            message?: string | null;
+        };
+        ApiResponseWorkspaceMemberListResponse: {
+            success?: boolean;
+            data?: components["schemas"]["WorkspaceMemberListResponse"];
+            message?: string | null;
+        };
+        ApiResponsePageResponseWorkspaceResponse: {
+            success?: boolean;
+            data?: components["schemas"]["PageResponseWorkspaceResponse"];
+            message?: string | null;
+        };
+        ApiResponseProblemResponse: {
+            success?: boolean;
+            data?: components["schemas"]["ProblemResponse"];
+            message?: string | null;
+        };
+        ApiResponseSubmissionResponse: {
+            success?: boolean;
+            data?: components["schemas"]["SubmissionResponse"];
+            message?: string | null;
+        };
+        SignupRequest: {
+            /** Format: email */
+            email: string;
+            password: string;
             name: string;
+        };
+        LoginRequest: {
+            email: string;
+            password: string;
+        };
+        RefreshRequest: {
+            refreshToken: string;
+        };
+        AuthTokenResponse: {
+            accessToken?: string;
+            refreshToken?: string;
+        };
+        UserResponse: {
             /** @description 유저 ID */
             id: number;
-            /** @description 프로필 이미지 URL */
-            profileImageUrl?: string | null;
             /** @description 이메일 */
             email: string;
+            /** @description 이름 */
+            name: string;
+            /** @description 프로필 이미지 URL */
+            profileImageUrl?: string | null;
+            /** @description 인증 제공자 (GOOGLE, KAKAO, LOCAL) */
+            provider: string;
         };
-        /** UserUpdateRequest */
         UserUpdateRequest: {
             /** @description 수정할 이름 (30자 이내) */
             name?: string | null;
             /** @description 수정할 프로필 이미지 URL */
             profileImageUrl?: string | null;
+        };
+        WorkspaceResponse: {
+            /**
+             * Format: int64
+             * @description 워크스페이스 ID
+             */
+            id?: number;
+            /** @description 워크스페이스 이름 */
+            name?: string;
+            /** @description 워크스페이스 설명 */
+            description?: string | null;
+        };
+        WorkspaceListResponse: {
+            items?: components["schemas"]["WorkspaceResponse"][];
+        };
+        WorkspaceSettingsResponse: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            description?: string | null;
+            /** @description Mattermost Webhook URL */
+            mmWebhookUrl?: string | null;
+        };
+        WorkspaceMemberResponse: {
+            /**
+             * Format: int64
+             * @description 워크스페이스 멤버 ID
+             */
+            workspaceMemberId?: number;
+            /** @description 워크스페이스 내 닉네임 */
+            nickname?: string;
+            /**
+             * @description 멤버 역할 (OWNER, ADMIN, MEMBER)
+             * @enum {string}
+             */
+            role?: "OWNER" | "ADMIN" | "MEMBER";
+        };
+        WorkspaceMemberListResponse: {
+            items?: components["schemas"]["WorkspaceMemberResponse"][];
+        };
+        PageResponseWorkspaceResponse: {
+            content?: components["schemas"]["WorkspaceResponse"][];
+            page?: components["schemas"]["PageInfo"];
+        };
+        PageInfo: {
+            page?: number;
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            totalPages?: number;
+        };
+        CreateWorkspaceRequest: {
+            /** @description 워크스페이스 이름 */
+            name: string;
+            /** @description 워크스페이스 설명 */
+            description?: string | null;
+        };
+        UpdateWorkspaceRequest: {
+            name?: string | null;
+            description?: string | null;
+            mmWebhookUrl?: string | null;
+        };
+        InviteWorkspaceMemberRequest: {
+            /**
+             * Format: email
+             * @description 초대할 사용자 이메일
+             */
+            email: string;
+        };
+        UpdateWorkspaceMemberNicknameRequest: {
+            /** @description 변경할 닉네임 */
+            nickname: string;
+        };
+        UpdateWorkspaceMemberRoleRequest: {
+            /**
+             * @description 변경할 역할
+             * @enum {string}
+             */
+            role: "OWNER" | "ADMIN" | "MEMBER";
+        };
+        ProblemResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** @description 백준 문제 번호 */
+            problemNumber?: number;
+            title?: string;
+            tier?: string | null;
+            timeLimit?: string | null;
+            memoryLimit?: string | null;
+            description?: string | null;
+            inputDescription?: string | null;
+            outputDescription?: string | null;
+            url?: string | null;
+            samples?: components["schemas"]["SampleResponse"][];
+            algorithmTags?: components["schemas"]["AlgorithmTagResponse"][];
+        };
+        SampleResponse: {
+            sampleIndex?: number;
+            input?: string;
+            output?: string;
+        };
+        AlgorithmTagResponse: {
+            name?: string;
+        };
+        ProblemIngestRequest: {
+            problemNum: number;
+            title: string;
+            tier?: string | null;
+            timeLimit?: string | null;
+            memoryLimit?: string | null;
+            problemDesc?: string | null;
+            problemInput?: string | null;
+            problemOutput?: string | null;
+            url?: string | null;
+            samples?: components["schemas"]["SampleDto"][];
+            tags?: components["schemas"]["TagDto"][];
+        };
+        SampleDto: {
+            sampleIndex?: number;
+            input?: string;
+            output?: string;
+        };
+        TagDto: {
+            name?: string;
+        };
+        SubmissionResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            baekjoonSubmissionId?: number;
+            problemNumber?: number;
+            username?: string;
+            verdict?: string;
+            executionTime?: string | null;
+            memory?: string | null;
+            language?: string | null;
+            codeLength?: string | null;
+        };
+        SubmissionIngestRequest: {
+            /** Format: int64 */
+            submissionId: number;
+            problemNum: number;
+            username: string;
+            verdict: string;
+            time?: string | null;
+            memory?: string | null;
+            language?: string | null;
+            codeLength?: string | null;
+            code?: string | null;
         };
     };
     responses: never;
@@ -65,6 +623,100 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "auth-signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SignupRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseAuthTokenResponse"];
+                };
+            };
+        };
+    };
+    "auth-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseAuthTokenResponse"];
+                };
+            };
+        };
+    };
+    "auth-refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseAuthTokenResponse"];
+                };
+            };
+        };
+    };
+    "auth-logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "user-get-me": {
         parameters: {
             query?: never;
@@ -80,7 +732,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserResponse"];
+                    "application/json": components["schemas"]["ApiResponseUserResponse"];
                 };
             };
         };
@@ -112,7 +764,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8": components["schemas"]["UserUpdateRequest"];
+                "application/json": components["schemas"]["UserUpdateRequest"];
             };
         };
         responses: {
@@ -122,7 +774,462 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserResponse"];
+                    "application/json": components["schemas"]["ApiResponseUserResponse"];
+                };
+            };
+        };
+    };
+    "workspace-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseWorkspaceListResponse"];
+                };
+            };
+        };
+    };
+    "workspace-create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CreateWorkspaceRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseWorkspaceResponse"];
+                };
+            };
+        };
+    };
+    "workspace-explore": {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponsePageResponseWorkspaceResponse"];
+                };
+            };
+        };
+    };
+    "workspace-search": {
+        parameters: {
+            query: {
+                name: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponsePageResponseWorkspaceResponse"];
+                };
+            };
+        };
+    };
+    "workspace-get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseWorkspaceResponse"];
+                };
+            };
+        };
+    };
+    "workspace-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 204 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "workspace-update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateWorkspaceRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseWorkspaceResponse"];
+                };
+            };
+        };
+    };
+    "workspace-get-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseWorkspaceSettingsResponse"];
+                };
+            };
+        };
+    };
+    "workspace-member-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseWorkspaceMemberListResponse"];
+                };
+            };
+        };
+    };
+    "workspace-member-get-me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseWorkspaceMemberResponse"];
+                };
+            };
+        };
+    };
+    "workspace-member-leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 204 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "workspace-member-update-nickname": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateWorkspaceMemberNicknameRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseWorkspaceMemberResponse"];
+                };
+            };
+        };
+    };
+    "workspace-member-invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["InviteWorkspaceMemberRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "workspace-member-update-role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                workspaceMemberId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateWorkspaceMemberRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "workspace-member-remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                workspaceMemberId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 204 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "problem-get-by-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                problemId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseProblemResponse"];
+                };
+            };
+        };
+    };
+    "problem-get-by-number": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                problemNumber: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseProblemResponse"];
+                };
+            };
+        };
+    };
+    "problem-ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ProblemIngestRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseProblemResponse"];
+                };
+            };
+        };
+    };
+    "submission-get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submissionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseSubmissionResponse"];
+                };
+            };
+        };
+    };
+    "submission-ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SubmissionIngestRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseSubmissionResponse"];
                 };
             };
         };
