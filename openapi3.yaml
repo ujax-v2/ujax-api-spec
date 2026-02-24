@@ -2,90 +2,397 @@ openapi: 3.0.1
 info:
   title: ujax API
   description: 백준 알고리즘 스터디 프로젝트 백엔드 API
-  version: 0.0.2-SNAPSHOT
+  version: 0.0.1-SNAPSHOT
 servers:
 - url: http://localhost:8080
-tags:
-- name: Auth
-- name: User
-- name: Workspace
-- name: Board
-- name: Problem
-- name: Submission
+security:
+- bearerAuth: []
+tags: []
 paths:
-  # ──────────────── Auth ────────────────
-  /api/v1/auth/signup:
-    post:
-      tags: [Auth]
-      summary: 회원가입
-      operationId: auth-signup
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SignupRequest"
+  /api/v1/workspaces:
+    get:
+      tags:
+      - Workspace
+      summary: 내 워크스페이스 목록 조회
+      description: 유저가 속한 워크스페이스 목록을 조회합니다
+      operationId: workspace-my-list
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseAuthTokenResponse"
-
+                $ref: "#/components/schemas/ApiResponse-WorkspaceList"
+              examples:
+                workspace-my-list:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "items" : [ {
+                          "id" : 1,
+                          "name" : "워크스페이스",
+                          "description" : "소개"
+                        } ]
+                      },
+                      "message" : null
+                    }
+    post:
+      tags:
+      - Workspace
+      summary: 워크스페이스 생성
+      description: 워크스페이스 생성
+      operationId: workspace-create
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/CreateWorkspaceRequest"
+            examples:
+              workspace-create-error:
+                value: |-
+                  {
+                    "name" : "",
+                    "description" : "소개"
+                  }
+              workspace-create:
+                value: |-
+                  {
+                    "name" : "워크스페이스",
+                    "description" : "소개"
+                  }
+      responses:
+        "400":
+          description: "400"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Validation"
+              examples:
+                workspace-create-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C001",
+                      "status" : 400,
+                      "detail" : "잘못된 요청 형식입니다.",
+                      "instance" : "/api/v1/workspaces",
+                      "exception" : "MethodArgumentNotValidException",
+                      "timestamp" : "2026-02-24T16:23:51.926893",
+                      "fieldErrors" : [ {
+                        "field" : "name",
+                        "rejectedValue" : "",
+                        "message" : "must not be blank"
+                      } ]
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-WorkspaceResponse"
+              examples:
+                workspace-create:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "name" : "워크스페이스",
+                        "description" : "소개"
+                      },
+                      "message" : null
+                    }
   /api/v1/auth/login:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: 로그인
+      description: 이메일/비밀번호로 로그인합니다
       operationId: auth-login
       requestBody:
         content:
-          application/json:
+          application/json;charset=UTF-8:
             schema:
               $ref: "#/components/schemas/LoginRequest"
+            examples:
+              auth-login:
+                value: |-
+                  {
+                    "email" : "test@example.com",
+                    "password" : "password123"
+                  }
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseAuthTokenResponse"
-
-  /api/v1/auth/refresh:
-    post:
-      tags: [Auth]
-      summary: 토큰 갱신
-      operationId: auth-refresh
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RefreshRequest"
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseAuthTokenResponse"
-
+                $ref: "#/components/schemas/ApiResponse-AuthTokenResponse"
+              examples:
+                auth-login:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "accessToken" : "access.token.here",
+                        "refreshToken" : "refresh.token.here"
+                      },
+                      "message" : null
+                    }
   /api/v1/auth/logout:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: 로그아웃
+      description: 리프레시 토큰을 해지합니다
       operationId: auth-logout
       requestBody:
         content:
-          application/json:
+          application/json;charset=UTF-8:
             schema:
               $ref: "#/components/schemas/RefreshRequest"
+            examples:
+              auth-logout:
+                value: |-
+                  {
+                    "refreshToken" : "refresh.token.here"
+                  }
       responses:
         "200":
           description: "200"
-
-  # ──────────────── User ────────────────
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                auth-logout:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+  /api/v1/auth/refresh:
+    post:
+      tags:
+      - Auth
+      summary: 토큰 갱신
+      description: 리프레시 토큰으로 새 토큰을 발급받습니다
+      operationId: auth-refresh
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+            examples:
+              auth-refresh:
+                value: |-
+                  {
+                    "refreshToken" : "refresh.token.here"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-AuthTokenResponse"
+              examples:
+                auth-refresh:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "accessToken" : "new.access.token",
+                        "refreshToken" : "new.refresh.token"
+                      },
+                      "message" : null
+                    }
+  /api/v1/auth/signup:
+    post:
+      tags:
+      - Auth
+      summary: 회원가입
+      description: 이메일/비밀번호로 회원가입합니다
+      operationId: auth-signup
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+            examples:
+              auth-signup:
+                value: |-
+                  {
+                    "email" : "test@example.com",
+                    "password" : "password123",
+                    "name" : "테스트유저"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-AuthTokenResponse"
+              examples:
+                auth-signup:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "accessToken" : "access.token.here",
+                        "refreshToken" : "refresh.token.here"
+                      },
+                      "message" : null
+                    }
+  /api/v1/problems/ingest:
+    post:
+      tags:
+      - Problem
+      summary: 문제 등록
+      description: 크롤러에서 수집한 백준 문제를 등록합니다
+      operationId: problem-ingest
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/ProblemIngestRequest"
+            examples:
+              problem-ingest:
+                value: |-
+                  {
+                    "problemNum" : 1000,
+                    "title" : "A+B",
+                    "tier" : "Bronze V",
+                    "timeLimit" : "2 초",
+                    "memoryLimit" : "128 MB",
+                    "problemDesc" : "두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.",
+                    "problemInput" : "첫째 줄에 A와 B가 주어진다. (0 < A, B < 10)",
+                    "problemOutput" : "첫째 줄에 A+B를 출력한다.",
+                    "url" : "https://www.acmicpc.net/problem/1000",
+                    "samples" : [ {
+                      "sampleIndex" : 1,
+                      "input" : "1 2",
+                      "output" : "3"
+                    }, {
+                      "sampleIndex" : 2,
+                      "input" : "3 4",
+                      "output" : "7"
+                    } ],
+                    "tags" : [ {
+                      "name" : "수학"
+                    }, {
+                      "name" : "구현"
+                    } ]
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-ProblemResponse"
+              examples:
+                problem-ingest:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "problemNumber" : 1000,
+                        "title" : "A+B",
+                        "tier" : "Bronze V",
+                        "timeLimit" : "2 초",
+                        "memoryLimit" : "128 MB",
+                        "description" : "두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.",
+                        "inputDescription" : "첫째 줄에 A와 B가 주어진다. (0 < A, B < 10)",
+                        "outputDescription" : "첫째 줄에 A+B를 출력한다.",
+                        "url" : "https://www.acmicpc.net/problem/1000",
+                        "samples" : [ {
+                          "id" : 1,
+                          "sampleIndex" : 1,
+                          "input" : "1 2",
+                          "output" : "3"
+                        }, {
+                          "id" : 2,
+                          "sampleIndex" : 2,
+                          "input" : "3 4",
+                          "output" : "7"
+                        } ],
+                        "algorithmTags" : [ {
+                          "id" : 1,
+                          "name" : "수학"
+                        }, {
+                          "id" : 2,
+                          "name" : "구현"
+                        } ]
+                      },
+                      "message" : null
+                    }
+  /api/v1/problems/{problemId}:
+    get:
+      tags:
+      - Problem
+      summary: 문제 조회
+      description: 문제 ID로 문제를 조회합니다
+      operationId: problem-get
+      parameters:
+      - name: problemId
+        in: path
+        description: 문제 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-ProblemResponse"
+              examples:
+                problem-get:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "problemNumber" : 1000,
+                        "title" : "A+B",
+                        "tier" : "Bronze V",
+                        "timeLimit" : "2 초",
+                        "memoryLimit" : "128 MB",
+                        "description" : "두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.",
+                        "inputDescription" : "첫째 줄에 A와 B가 주어진다. (0 < A, B < 10)",
+                        "outputDescription" : "첫째 줄에 A+B를 출력한다.",
+                        "url" : "https://www.acmicpc.net/problem/1000",
+                        "samples" : [ {
+                          "id" : 1,
+                          "sampleIndex" : 1,
+                          "input" : "1 2",
+                          "output" : "3"
+                        }, {
+                          "id" : 2,
+                          "sampleIndex" : 2,
+                          "input" : "3 4",
+                          "output" : "7"
+                        } ],
+                        "algorithmTags" : [ {
+                          "id" : 1,
+                          "name" : "수학"
+                        }, {
+                          "id" : 2,
+                          "name" : "구현"
+                        } ]
+                      },
+                      "message" : null
+                    }
   /api/v1/users/me:
     get:
-      tags: [User]
+      tags:
+      - User
       summary: 내 정보 조회
       description: 로그인한 사용자의 정보를 조회합니다
       operationId: user-get-me
@@ -95,1554 +402,2630 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseUserResponse"
+                $ref: "#/components/schemas/ApiResponse-UserResponse"
+              examples:
+                user-get-me:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "email" : "test@example.com",
+                        "name" : "테스트유저",
+                        "profileImageUrl" : "https://example.com/profile.jpg",
+                        "provider" : "GOOGLE",
+                        "baekjoonId" : null
+                      },
+                      "message" : null
+                    }
+    delete:
+      tags:
+      - User
+      summary: 회원 탈퇴
+      description: 로그인한 사용자의 계정을 삭제합니다
+      operationId: user-delete-me
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                user-delete-me:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
     patch:
-      tags: [User]
+      tags:
+      - User
       summary: 내 정보 수정
       description: 로그인한 사용자의 정보를 수정합니다
       operationId: user-update-me
       requestBody:
         content:
-          application/json:
+          application/json;charset=UTF-8:
             schema:
               $ref: "#/components/schemas/UserUpdateRequest"
+            examples:
+              user-update-me:
+                value: |-
+                  {
+                    "name" : "수정된이름",
+                    "profileImageUrl" : "https://example.com/new-profile.jpg",
+                    "baekjoonId" : null
+                  }
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseUserResponse"
-    delete:
-      tags: [User]
-      summary: 회원 탈퇴
-      description: 로그인한 사용자의 계정을 삭제합니다
-      operationId: user-delete-me
-      responses:
-        "204":
-          description: "204"
-
-  # ──────────────── Workspace ────────────────
-  /api/v1/workspaces:
-    get:
-      tags: [Workspace]
-      summary: 내 워크스페이스 목록 조회
-      operationId: workspace-list
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseWorkspaceListResponse"
-    post:
-      tags: [Workspace]
-      summary: 워크스페이스 생성
-      operationId: workspace-create
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateWorkspaceRequest"
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseWorkspaceResponse"
-
+                $ref: "#/components/schemas/ApiResponse-UserResponse"
+              examples:
+                user-update-me:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "email" : "test@example.com",
+                        "name" : "수정된이름",
+                        "profileImageUrl" : "https://example.com/new-profile.jpg",
+                        "provider" : "GOOGLE",
+                        "baekjoonId" : null
+                      },
+                      "message" : null
+                    }
   /api/v1/workspaces/explore:
     get:
-      tags: [Workspace]
-      summary: 워크스페이스 탐색 (공개)
+      tags:
+      - Workspace
+      summary: 워크스페이스 탐색 목록 조회
+      description: 워크스페이스 탐색 페이지에서 목록을 조회합니다
       operationId: workspace-explore
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          schema:
-            type: integer
-            default: 12
+      - name: page
+        in: query
+        description: 페이지 번호
+        required: false
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: 페이지 크기
+        required: false
+        schema:
+          type: string
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponsePageResponseWorkspaceResponse"
-
+                $ref: "#/components/schemas/ApiResponse-WorkspaceExplore"
+              examples:
+                workspace-explore:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "content" : [ {
+                          "id" : 1,
+                          "name" : "워크스페이스",
+                          "description" : "소개"
+                        } ],
+                        "page" : {
+                          "page" : 0,
+                          "size" : 20,
+                          "totalElements" : 1,
+                          "totalPages" : 1,
+                          "first" : true,
+                          "last" : true
+                        }
+                      },
+                      "message" : null
+                    }
+        "400":
+          description: "400"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-InvalidParameter"
+              examples:
+                workspace-explore-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C004",
+                      "status" : 400,
+                      "detail" : "파라미터 'page'의 타입이 올바르지 않습니다. (기대 타입: int)",
+                      "instance" : "/api/v1/workspaces/explore",
+                      "exception" : "MethodArgumentTypeMismatchException",
+                      "timestamp" : "2026-02-24T16:23:51.883474"
+                    }
   /api/v1/workspaces/search:
     get:
-      tags: [Workspace]
+      tags:
+      - Workspace
       summary: 워크스페이스 검색
+      description: 워크스페이스 검색
       operationId: workspace-search
       parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          schema:
-            type: integer
-            default: 12
+      - name: name
+        in: query
+        description: 검색어
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: 페이지 번호
+        required: false
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: 페이지 크기
+        required: false
+        schema:
+          type: string
       responses:
+        "400":
+          description: "400"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-MissingParameter"
+              examples:
+                workspace-search-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C003",
+                      "status" : 400,
+                      "detail" : "필수 파라미터 'name'이(가) 누락되었습니다.",
+                      "instance" : "/api/v1/workspaces/search",
+                      "exception" : "MissingServletRequestParameterException",
+                      "timestamp" : "2026-02-24T16:23:52.030411"
+                    }
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponsePageResponseWorkspaceResponse"
-
+                $ref: "#/components/schemas/ApiResponse-WorkspaceSearch"
+              examples:
+                workspace-search:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "content" : [ {
+                          "id" : 1,
+                          "name" : "워크스페이스",
+                          "description" : "소개"
+                        } ],
+                        "page" : {
+                          "page" : 0,
+                          "size" : 20,
+                          "totalElements" : 1,
+                          "totalPages" : 1,
+                          "first" : true,
+                          "last" : true
+                        }
+                      },
+                      "message" : null
+                    }
   /api/v1/workspaces/{workspaceId}:
     get:
-      tags: [Workspace]
+      tags:
+      - Workspace
       summary: 워크스페이스 상세 조회
+      description: 워크스페이스 상세 조회
       operationId: workspace-get
       parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
       responses:
+        "404":
+          description: "404"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-NotFound"
+              examples:
+                workspace-get-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "R003",
+                      "status" : 404,
+                      "detail" : "워크스페이스를 찾을 수 없습니다.",
+                      "instance" : "/api/v1/workspaces/999",
+                      "exception" : "NotFoundException",
+                      "timestamp" : "2026-02-24T16:23:52.067335"
+                    }
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseWorkspaceResponse"
-    patch:
-      tags: [Workspace]
-      summary: 워크스페이스 수정
-      operationId: workspace-update
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateWorkspaceRequest"
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseWorkspaceResponse"
+                $ref: "#/components/schemas/ApiResponse-WorkspaceResponse"
+              examples:
+                workspace-get:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "name" : "워크스페이스",
+                        "description" : "소개"
+                      },
+                      "message" : null
+                    }
     delete:
-      tags: [Workspace]
+      tags:
+      - Workspace
       summary: 워크스페이스 삭제
+      description: 워크스페이스를 삭제합니다
       operationId: workspace-delete
       parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "204":
-          description: "204"
-
-  /api/v1/workspaces/{workspaceId}/settings:
-    get:
-      tags: [Workspace]
-      summary: 워크스페이스 설정 조회
-      operationId: workspace-get-settings
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseWorkspaceSettingsResponse"
-
-  /api/v1/workspaces/{workspaceId}/members:
-    get:
-      tags: [Workspace]
-      summary: 워크스페이스 멤버 목록 조회
-      operationId: workspace-member-list
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: "200"
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                workspace-delete:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+        "403":
+          description: "403"
           content:
-            application/json:
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/ApiResponseWorkspaceMemberListResponse"
-
-  /api/v1/workspaces/{workspaceId}/members/me:
-    get:
-      tags: [Workspace]
-      summary: 워크스페이스 내 멤버 정보 조회
-      operationId: workspace-member-get-me
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseWorkspaceMemberResponse"
-    delete:
-      tags: [Workspace]
-      summary: 워크스페이스 탈퇴
-      operationId: workspace-member-leave
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "204":
-          description: "204"
-
-  /api/v1/workspaces/{workspaceId}/members/me/nickname:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                workspace-delete-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A014",
+                      "status" : 403,
+                      "detail" : "소유자만 이 작업을 수행할 수 있습니다.",
+                      "instance" : "/api/v1/workspaces/1",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-24T16:23:51.936818"
+                    }
     patch:
-      tags: [Workspace]
-      summary: 워크스페이스 닉네임 변경
-      operationId: workspace-member-update-nickname
+      tags:
+      - Workspace
+      summary: 워크스페이스 수정
+      description: 워크스페이스 정보를 수정합니다
+      operationId: workspace-update
       parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
-          application/json:
+          application/json;charset=UTF-8:
             schema:
-              $ref: "#/components/schemas/UpdateWorkspaceMemberNicknameRequest"
+              $ref: "#/components/schemas/UpdateWorkspaceRequest"
+            examples:
+              workspace-update:
+                value: |-
+                  {
+                    "name" : "새 이름",
+                    "description" : "새 소개",
+                    "mmWebhookUrl" : "https://hook.example.com"
+                  }
+              workspace-update-error:
+                value: |-
+                  {
+                    "name" : "",
+                    "description" : "새 소개",
+                    "mmWebhookUrl" : null
+                  }
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseWorkspaceMemberResponse"
-
-  /api/v1/workspaces/{workspaceId}/members/invite:
-    post:
-      tags: [Workspace]
-      summary: 워크스페이스 멤버 초대
-      operationId: workspace-member-invite
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/InviteWorkspaceMemberRequest"
-      responses:
-        "200":
-          description: "200"
-
-  /api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}/role:
-    patch:
-      tags: [Workspace]
-      summary: 멤버 역할 변경
-      operationId: workspace-member-update-role
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: workspaceMemberId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateWorkspaceMemberRoleRequest"
-      responses:
-        "200":
-          description: "200"
-
-  /api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}:
-    delete:
-      tags: [Workspace]
-      summary: 멤버 강퇴
-      operationId: workspace-member-remove
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: workspaceMemberId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "204":
-          description: "204"
-
-  # ──────────────── Board ────────────────
-  /api/v1/workspaces/{workspaceId}/boards:
-    get:
-      tags: [Board]
-      summary: 게시글 목록 조회
-      operationId: board-list
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: type
-          in: query
-          schema:
-            type: string
-            enum: [FREE, NOTICE, QNA, DATA]
-        - name: keyword
-          in: query
-          schema:
-            type: string
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          schema:
-            type: integer
-            default: 20
-        - name: sort
-          in: query
-          schema:
-            type: string
-        - name: pinnedFirst
-          in: query
-          schema:
-            type: boolean
-            default: true
-      responses:
-        "200":
-          description: "200"
+                $ref: "#/components/schemas/ApiResponse-WorkspaceResponse"
+              examples:
+                workspace-update:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "name" : "새 이름",
+                        "description" : "새 소개"
+                      },
+                      "message" : null
+                    }
+        "400":
+          description: "400"
           content:
-            application/json:
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/ApiResponseBoardListResponse"
-    post:
-      tags: [Board]
-      summary: 게시글 작성
-      operationId: board-create
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateBoardRequest"
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseBoardDetailResponse"
-
-  /api/v1/workspaces/{workspaceId}/boards/{boardId}:
-    get:
-      tags: [Board]
-      summary: 게시글 상세 조회
-      operationId: board-get
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseBoardDetailResponse"
-    patch:
-      tags: [Board]
-      summary: 게시글 수정
-      operationId: board-update
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateBoardRequest"
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseBoardDetailResponse"
-    delete:
-      tags: [Board]
-      summary: 게시글 삭제
-      operationId: board-delete
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "204":
-          description: "204"
-
-  /api/v1/workspaces/{workspaceId}/boards/{boardId}/pin:
-    patch:
-      tags: [Board]
-      summary: 게시글 고정/해제
-      operationId: board-pin
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PinBoardRequest"
-      responses:
-        "200":
-          description: "200"
-
-  /api/v1/workspaces/{workspaceId}/boards/{boardId}/likes:
-    put:
-      tags: [Board]
-      summary: 게시글 추천
-      operationId: board-like
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: "200"
-    get:
-      tags: [Board]
-      summary: 게시글 추천 상태 조회
-      operationId: board-like-status
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseBoardLikeStatusResponse"
-    delete:
-      tags: [Board]
-      summary: 게시글 추천 취소
-      operationId: board-unlike
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: "200"
-
-  /api/v1/workspaces/{workspaceId}/boards/{boardId}/comments:
-    get:
-      tags: [Board]
-      summary: 댓글 목록 조회
-      operationId: board-comment-list
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          schema:
-            type: integer
-            default: 20
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseCommentListResponse"
-    post:
-      tags: [Board]
-      summary: 댓글 작성
-      operationId: board-comment-create
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateCommentRequest"
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseCommentResponse"
-
-  /api/v1/workspaces/{workspaceId}/boards/{boardId}/comments/{commentId}:
-    delete:
-      tags: [Board]
-      summary: 댓글 삭제
-      operationId: board-comment-delete
-      parameters:
-        - name: workspaceId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: commentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "204":
-          description: "204"
-
-  # ──────────────── Problem ────────────────
-  /api/v1/problems/{problemId}:
-    get:
-      tags: [Problem]
-      summary: 문제 조회 (ID)
-      operationId: problem-get-by-id
-      parameters:
-        - name: problemId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseProblemResponse"
-
+                $ref: "#/components/schemas/ProblemDetail-Validation"
+              examples:
+                workspace-update-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C001",
+                      "status" : 400,
+                      "detail" : "잘못된 요청 형식입니다.",
+                      "instance" : "/api/v1/workspaces/1",
+                      "exception" : "BadRequestException",
+                      "timestamp" : "2026-02-24T16:23:51.858301"
+                    }
   /api/v1/problems/number/{problemNumber}:
     get:
-      tags: [Problem]
-      summary: 문제 조회 (백준 번호)
+      tags:
+      - Problem
+      summary: 문제 번호로 조회
+      description: 백준 문제 번호로 문제를 조회합니다
       operationId: problem-get-by-number
       parameters:
-        - name: problemNumber
-          in: path
-          required: true
-          schema:
-            type: integer
+      - name: problemNumber
+        in: path
+        description: 백준 문제 번호
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseProblemResponse"
-
-  /api/v1/problems/ingest:
-    post:
-      tags: [Problem]
-      summary: 문제 수집 (익스텐션)
-      operationId: problem-ingest
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ProblemIngestRequest"
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponseProblemResponse"
-
-  # ──────────────── Submission ────────────────
-  /api/v1/submissions/{submissionId}:
+                $ref: "#/components/schemas/ApiResponse-ProblemResponse"
+              examples:
+                problem-get-by-number:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "problemNumber" : 1000,
+                        "title" : "A+B",
+                        "tier" : "Bronze V",
+                        "timeLimit" : "2 초",
+                        "memoryLimit" : "128 MB",
+                        "description" : "두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.",
+                        "inputDescription" : "첫째 줄에 A와 B가 주어진다. (0 < A, B < 10)",
+                        "outputDescription" : "첫째 줄에 A+B를 출력한다.",
+                        "url" : "https://www.acmicpc.net/problem/1000",
+                        "samples" : [ {
+                          "id" : 1,
+                          "sampleIndex" : 1,
+                          "input" : "1 2",
+                          "output" : "3"
+                        }, {
+                          "id" : 2,
+                          "sampleIndex" : 2,
+                          "input" : "3 4",
+                          "output" : "7"
+                        } ],
+                        "algorithmTags" : [ {
+                          "id" : 1,
+                          "name" : "수학"
+                        }, {
+                          "id" : 2,
+                          "name" : "구현"
+                        } ]
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/boards:
     get:
-      tags: [Submission]
-      summary: 제출 조회
-      operationId: submission-get
+      tags:
+      - Board
+      summary: 게시글 목록 조회
+      description: 워크스페이스 게시글 목록을 조회합니다
+      operationId: board-list
       parameters:
-        - name: submissionId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: type
+        in: query
+        description: 게시글 타입
+        required: false
+        schema:
+          type: string
+      - name: keyword
+        in: query
+        description: 검색어
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: 페이지
+        required: false
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: 크기
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: 정렬
+        required: false
+        schema:
+          type: string
+      - name: pinnedFirst
+        in: query
+        description: 고정글 우선 정렬
+        required: false
+        schema:
+          type: string
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseSubmissionResponse"
-
-  /api/v1/submissions/ingest:
+                $ref: "#/components/schemas/ApiResponse-BoardList"
+              examples:
+                board-list:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "items" : [ {
+                          "boardId" : 2,
+                          "workspaceId" : 1,
+                          "type" : "FREE",
+                          "pinned" : false,
+                          "title" : "제목",
+                          "preview" : "미리보기",
+                          "viewCount" : 3,
+                          "likeCount" : 5,
+                          "commentCount" : 2,
+                          "myLike" : false,
+                          "author" : {
+                            "workspaceMemberId" : 3,
+                            "nickname" : "작성자"
+                          },
+                          "createdAt" : "2026-02-24T16:23:49.935584",
+                          "updatedAt" : "2026-02-24T16:23:49.935587"
+                        } ],
+                        "page" : {
+                          "page" : 0,
+                          "size" : 20,
+                          "totalElements" : 1,
+                          "totalPages" : 1,
+                          "first" : true,
+                          "last" : true
+                        }
+                      },
+                      "message" : null
+                    }
     post:
-      tags: [Submission]
-      summary: 제출 수집 (익스텐션)
-      operationId: submission-ingest
+      tags:
+      - Board
+      summary: 게시글 생성
+      description: 게시글을 생성합니다
+      operationId: board-create
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
-          application/json:
+          application/json;charset=UTF-8:
             schema:
-              $ref: "#/components/schemas/SubmissionIngestRequest"
+              $ref: "#/components/schemas/CreateBoardRequest"
+            examples:
+              board-create:
+                value: |-
+                  {
+                    "type" : "FREE",
+                    "title" : "제목",
+                    "content" : "내용",
+                    "pinned" : true
+                  }
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponseSubmissionResponse"
-
+                $ref: "#/components/schemas/ApiResponse-BoardDetail"
+              examples:
+                board-create:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "boardId" : 2,
+                        "workspaceId" : 1,
+                        "type" : "FREE",
+                        "pinned" : false,
+                        "title" : "제목",
+                        "content" : "내용",
+                        "viewCount" : 3,
+                        "likeCount" : 5,
+                        "commentCount" : 2,
+                        "myLike" : true,
+                        "author" : {
+                          "workspaceMemberId" : 3,
+                          "nickname" : "작성자"
+                        },
+                        "createdAt" : "2026-02-24T16:23:49.888766",
+                        "updatedAt" : "2026-02-24T16:23:49.888769"
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/members:
+    get:
+      tags:
+      - Workspace
+      summary: 워크스페이스 멤버 목록 조회
+      description: 워크스페이스 멤버 목록 조회
+      operationId: workspace-members
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: "403"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                workspace-members-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A013",
+                      "status" : 403,
+                      "detail" : "워크스페이스에 소속된 멤버가 아닙니다.",
+                      "instance" : "/api/v1/workspaces/1/members",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-24T16:23:51.89384"
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-WorkspaceMemberList"
+              examples:
+                workspace-members:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "items" : [ {
+                          "workspaceMemberId" : 1,
+                          "nickname" : "닉네임",
+                          "role" : "MEMBER"
+                        } ]
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/settings:
+    get:
+      tags:
+      - Workspace
+      summary: 워크스페이스 설정 조회
+      description: 워크스페이스 설정 조회
+      operationId: workspace-settings
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: "403"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                workspace-settings-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A014",
+                      "status" : 403,
+                      "detail" : "소유자만 이 작업을 수행할 수 있습니다.",
+                      "instance" : "/api/v1/workspaces/1/settings",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-24T16:23:52.082409"
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-WorkspaceSettings"
+              examples:
+                workspace-settings:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "name" : "워크스페이스",
+                        "description" : "소개",
+                        "mmWebhookUrl" : "https://hook.example.com"
+                      },
+                      "message" : null
+                    }
+  /api/v1/users/me/profile-image/presigned-url:
+    post:
+      tags:
+      - User
+      summary: 프로필 이미지 업로드 Presigned URL 생성
+      description: "S3에 프로필 이미지를 업로드하기 위한 Presigned URL을 생성합니다. JPEG, PNG, WEBP만 허\
+        용되며 최대 5MB입니다."
+      operationId: user-create-profile-image-presigned-url
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/ProfileImageUploadRequest"
+            examples:
+              user-create-profile-image-presigned-url:
+                value: |-
+                  {
+                    "contentType" : "image/png",
+                    "fileSize" : 1048576
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-PresignedUrlResponse"
+              examples:
+                user-create-profile-image-presigned-url:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "presignedUrl" : "https://ujax-profile-images.s3.ap-northeast-2.amazonaws.com/presigned?X-Amz-Algorithm=...",
+                        "imageUrl" : "https://ujax-profile-images.s3.ap-northeast-2.amazonaws.com/users/1/profile/uuid.png"
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}:
+    get:
+      tags:
+      - Board
+      summary: 게시글 상세 조회
+      description: 게시글 상세 정보를 조회합니다
+      operationId: board-get
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-BoardDetail"
+              examples:
+                board-get:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "boardId" : 2,
+                        "workspaceId" : 1,
+                        "type" : "FREE",
+                        "pinned" : false,
+                        "title" : "제목",
+                        "content" : "내용",
+                        "viewCount" : 3,
+                        "likeCount" : 5,
+                        "commentCount" : 2,
+                        "myLike" : true,
+                        "author" : {
+                          "workspaceMemberId" : 3,
+                          "nickname" : "작성자"
+                        },
+                        "createdAt" : "2026-02-24T16:23:50.002502",
+                        "updatedAt" : "2026-02-24T16:23:50.002505"
+                      },
+                      "message" : null
+                    }
+    delete:
+      tags:
+      - Board
+      summary: 게시글 삭제
+      description: 게시글을 삭제합니다
+      operationId: board-delete
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                board-delete:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+    patch:
+      tags:
+      - Board
+      summary: 게시글 수정
+      description: 게시글을 수정합니다
+      operationId: board-update
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/UpdateBoardRequest"
+            examples:
+              board-update:
+                value: |-
+                  {
+                    "type" : "QNA",
+                    "title" : "수정 제목",
+                    "content" : "수정 내용",
+                    "pinned" : true
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-BoardDetail"
+              examples:
+                board-update:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "boardId" : 2,
+                        "workspaceId" : 1,
+                        "type" : "FREE",
+                        "pinned" : false,
+                        "title" : "제목",
+                        "content" : "내용",
+                        "viewCount" : 3,
+                        "likeCount" : 5,
+                        "commentCount" : 2,
+                        "myLike" : true,
+                        "author" : {
+                          "workspaceMemberId" : 3,
+                          "nickname" : "작성자"
+                        },
+                        "createdAt" : "2026-02-24T16:23:49.862409",
+                        "updatedAt" : "2026-02-24T16:23:49.862412"
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/members/invite:
+    post:
+      tags:
+      - Workspace
+      summary: 워크스페이스 멤버 초대
+      description: 워크스페이스 멤버 초대
+      operationId: workspace-invite
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/InviteWorkspaceMemberRequest"
+            examples:
+              workspace-invite-error:
+                value: |-
+                  {
+                    "email" : "invalid-email"
+                  }
+              workspace-invite:
+                value: |-
+                  {
+                    "email" : "invite@example.com"
+                  }
+      responses:
+        "400":
+          description: "400"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Validation"
+              examples:
+                workspace-invite-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C001",
+                      "status" : 400,
+                      "detail" : "잘못된 요청 형식입니다.",
+                      "instance" : "/api/v1/workspaces/1/members/invite",
+                      "exception" : "MethodArgumentNotValidException",
+                      "timestamp" : "2026-02-24T16:23:51.950074",
+                      "fieldErrors" : [ {
+                        "field" : "email",
+                        "rejectedValue" : "invalid-email",
+                        "message" : "must be a well-formed email address"
+                      } ]
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                workspace-invite:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/members/me:
+    get:
+      tags:
+      - Workspace
+      summary: 워크스페이스 멤버 조회
+      description: 워크스페이스 멤버 조회
+      operationId: workspace-member-me
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: "403"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                workspace-member-me-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A013",
+                      "status" : 403,
+                      "detail" : "워크스페이스에 소속된 멤버가 아닙니다.",
+                      "instance" : "/api/v1/workspaces/1/members/me",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-24T16:23:52.05752"
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-WorkspaceMemberResponse"
+              examples:
+                workspace-member-me:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "workspaceMemberId" : 1,
+                        "nickname" : "닉네임",
+                        "role" : "MEMBER"
+                      },
+                      "message" : null
+                    }
+    delete:
+      tags:
+      - Workspace
+      summary: 워크스페이스 탈퇴
+      description: 워크스페이스 탈퇴
+      operationId: workspace-leave
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: "403"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                workspace-leave-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A012",
+                      "status" : 403,
+                      "detail" : "워크스페이스에 대한 권한이 없습니다.",
+                      "instance" : "/api/v1/workspaces/1/members/me",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-24T16:23:52.074911"
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                workspace-leave:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}:
+    delete:
+      tags:
+      - Workspace
+      summary: 워크스페이스 멤버 추방
+      description: 워크스페이스 멤버 추방
+      operationId: workspace-member-remove
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: workspaceMemberId
+        in: path
+        description: 워크스페이스 멤버 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: "403"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                workspace-member-remove-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A012",
+                      "status" : 403,
+                      "detail" : "워크스페이스에 대한 권한이 없습니다.",
+                      "instance" : "/api/v1/workspaces/1/members/2",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-24T16:23:51.870884"
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                workspace-member-remove:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}/comments:
+    get:
+      tags:
+      - Board
+      summary: 게시글 댓글 목록 조회
+      description: 게시글 댓글 목록을 조회합니다
+      operationId: board-comment-list
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: 페이지
+        required: false
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: 크기
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-CommentList"
+              examples:
+                board-comment-list:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "items" : [ {
+                          "boardCommentId" : 10,
+                          "boardId" : 2,
+                          "content" : "댓글",
+                          "author" : {
+                            "workspaceMemberId" : 3,
+                            "nickname" : "작성자"
+                          },
+                          "createdAt" : "2026-02-24T16:23:49.975995"
+                        } ],
+                        "page" : {
+                          "page" : 0,
+                          "size" : 20,
+                          "totalElements" : 1,
+                          "totalPages" : 1,
+                          "first" : true,
+                          "last" : true
+                        }
+                      },
+                      "message" : null
+                    }
+    post:
+      tags:
+      - Board
+      summary: 게시글 댓글 생성
+      description: 게시글 댓글을 생성합니다
+      operationId: board-comment-create
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/CreateCommentRequest"
+            examples:
+              board-comment-create:
+                value: |-
+                  {
+                    "content" : "댓글"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Comment"
+              examples:
+                board-comment-create:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "boardCommentId" : 10,
+                        "boardId" : 2,
+                        "content" : "댓글",
+                        "author" : {
+                          "workspaceMemberId" : 3,
+                          "nickname" : "작성자"
+                        },
+                        "createdAt" : "2026-02-24T16:23:49.836808"
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}/likes:
+    get:
+      tags:
+      - Board
+      summary: 게시글 좋아요 상태 조회
+      description: 좋아요 수와 내 좋아요 여부를 조회합니다
+      operationId: board-like-status
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-BoardLikeStatus"
+              examples:
+                board-like-status:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "likeCount" : 5,
+                        "myLike" : true
+                      },
+                      "message" : null
+                    }
+    put:
+      tags:
+      - Board
+      summary: 게시글 좋아요 등록
+      description: 게시글에 좋아요를 등록합니다
+      operationId: board-like
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                board-like:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+    delete:
+      tags:
+      - Board
+      summary: 게시글 좋아요 취소
+      description: 게시글 좋아요를 취소합니다
+      operationId: board-unlike
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                board-unlike:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}/pin:
+    patch:
+      tags:
+      - Board
+      summary: 게시글 고정 상태 변경
+      description: 게시글의 고정 상태를 변경합니다
+      operationId: board-pin
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/PinBoardRequest"
+            examples:
+              board-pin:
+                value: |-
+                  {
+                    "pinned" : true
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                board-pin:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/members/me/nickname:
+    patch:
+      tags:
+      - Workspace
+      summary: 워크스페이스 닉네임 수정
+      description: 워크스페이스 닉네임 수정
+      operationId: workspace-member-nickname-update
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkspaceMemberNicknameRequest"
+            examples:
+              workspace-member-nickname-update-error:
+                value: |-
+                  {
+                    "nickname" : ""
+                  }
+              workspace-member-nickname-update:
+                value: |-
+                  {
+                    "nickname" : "새닉네임"
+                  }
+      responses:
+        "400":
+          description: "400"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Validation"
+              examples:
+                workspace-member-nickname-update-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C001",
+                      "status" : 400,
+                      "detail" : "잘못된 요청 형식입니다.",
+                      "instance" : "/api/v1/workspaces/1/members/me/nickname",
+                      "exception" : "MethodArgumentNotValidException",
+                      "timestamp" : "2026-02-24T16:23:52.021723",
+                      "fieldErrors" : [ {
+                        "field" : "nickname",
+                        "rejectedValue" : "",
+                        "message" : "must not be blank"
+                      } ]
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-WorkspaceMemberResponse"
+              examples:
+                workspace-member-nickname-update:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "workspaceMemberId" : 1,
+                        "nickname" : "새닉네임",
+                        "role" : "MEMBER"
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}/role:
+    patch:
+      tags:
+      - Workspace
+      summary: 워크스페이스 멤버 권한 변경
+      description: 워크스페이스 멤버 권한을 변경합니다
+      operationId: workspace-member-role-update
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: workspaceMemberId
+        in: path
+        description: 워크스페이스 멤버 ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkspaceMemberRoleRequest"
+            examples:
+              workspace-member-role-update:
+                value: |-
+                  {
+                    "role" : "MANAGER"
+                  }
+              workspace-member-role-update-error:
+                value: "{ }"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                workspace-member-role-update:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+        "400":
+          description: "400"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Validation"
+              examples:
+                workspace-member-role-update-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C001",
+                      "status" : 400,
+                      "detail" : "잘못된 요청 형식입니다.",
+                      "instance" : "/api/v1/workspaces/1/members/2/role",
+                      "exception" : "MethodArgumentNotValidException",
+                      "timestamp" : "2026-02-24T16:23:51.98368",
+                      "fieldErrors" : [ {
+                        "field" : "role",
+                        "rejectedValue" : null,
+                        "message" : "must not be null"
+                      } ]
+                    }
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}/comments/{commentId}:
+    delete:
+      tags:
+      - Board
+      summary: 게시글 댓글 삭제
+      description: 게시글 댓글을 삭제합니다
+      operationId: board-comment-delete
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: boardId
+        in: path
+        description: 게시글 ID
+        required: true
+        schema:
+          type: string
+      - name: commentId
+        in: path
+        description: 댓글 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                board-comment-delete:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "로그인 후 받은 accessToken을 입력하세요"
   schemas:
-    # ──── Generic Wrapper ────
-    ApiResponseAuthTokenResponse:
+    ProblemDetail-Forbidden:
+      title: ProblemDetail-Forbidden
+      required:
+      - detail
+      - exception
+      - status
+      - timestamp
+      - title
+      - type
       type: object
       properties:
+        exception:
+          type: string
+          description: 예외 클래스명
+        instance:
+          type: string
+          description: 오류 인스턴스
+          nullable: true
+        detail:
+          type: string
+          description: 오류 상세 메시지
+        title:
+          type: string
+          description: 에러 코드
+        type:
+          type: string
+          description: 오류 문서 URI
+        timestamp:
+          type: string
+          description: 발생 시각
+        status:
+          type: number
+          description: HTTP 상태 코드
+    ProfileImageUploadRequest:
+      title: ProfileImageUploadRequest
+      required:
+      - contentType
+      - fileSize
+      type: object
+      properties:
+        fileSize:
+          type: number
+          description: "파일 크기 (바이트, 최대 5MB)"
+        contentType:
+          type: string
+          description: "이미지 Content-Type (image/jpeg, image/png, image/webp)"
+    RefreshRequest:
+      title: RefreshRequest
+      required:
+      - refreshToken
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          description: 리프레시 토큰
+    CreateCommentRequest:
+      title: CreateCommentRequest
+      required:
+      - content
+      type: object
+      properties:
+        content:
+          type: string
+          description: 댓글 내용
+    UpdateWorkspaceMemberRoleRequest:
+      title: UpdateWorkspaceMemberRoleRequest
+      required:
+      - role
+      type: object
+      properties:
+        role:
+          type: string
+          description: 변경할 권한
+    ApiResponse-WorkspaceSettings:
+      title: ApiResponse-WorkspaceSettings
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - id
+          - name
+          type: object
+          properties:
+            mmWebhookUrl:
+              type: string
+              description: MM 웹훅 URL
+              nullable: true
+            name:
+              type: string
+              description: 워크스페이스 이름
+            description:
+              type: string
+              description: 워크스페이스 설명
+              nullable: true
+            id:
+              type: number
+              description: 워크스페이스 ID
+          description: 응답 데이터
         success:
           type: boolean
-        data:
-          $ref: "#/components/schemas/AuthTokenResponse"
+          description: 성공 여부
         message:
           type: string
+          description: 메시지
           nullable: true
-
-    ApiResponseUserResponse:
+    ApiResponse-BoardLikeStatus:
+      title: ApiResponse-BoardLikeStatus
+      required:
+      - data
+      - success
       type: object
       properties:
+        data:
+          required:
+          - likeCount
+          - myLike
+          type: object
+          properties:
+            likeCount:
+              type: number
+              description: 좋아요 수
+            myLike:
+              type: boolean
+              description: 내 좋아요 여부
+          description: 응답 데이터
         success:
           type: boolean
-        data:
-          $ref: "#/components/schemas/UserResponse"
+          description: 성공 여부
         message:
           type: string
+          description: 메시지
           nullable: true
-
-    ApiResponseWorkspaceResponse:
+    ApiResponse-AuthTokenResponse:
+      title: ApiResponse-AuthTokenResponse
+      required:
+      - data
+      - success
       type: object
       properties:
+        data:
+          required:
+          - accessToken
+          - refreshToken
+          type: object
+          properties:
+            accessToken:
+              type: string
+              description: 새 액세스 토큰
+            refreshToken:
+              type: string
+              description: 새 리프레시 토큰
+          description: 응답 데이터
         success:
           type: boolean
-        data:
-          $ref: "#/components/schemas/WorkspaceResponse"
+          description: 성공 여부
         message:
           type: string
+          description: 메시지
           nullable: true
-
-    ApiResponseWorkspaceListResponse:
+    ApiResponse-BoardList:
+      title: ApiResponse-BoardList
+      required:
+      - data
+      - success
       type: object
       properties:
+        data:
+          type: object
+          description: 응답 데이터
         success:
           type: boolean
-        data:
-          $ref: "#/components/schemas/WorkspaceListResponse"
+          description: 성공 여부
         message:
           type: string
+          description: 메시지
           nullable: true
-
-    ApiResponseWorkspaceSettingsResponse:
+    ApiResponse-UserResponse:
+      title: ApiResponse-UserResponse
+      required:
+      - data
+      - success
       type: object
       properties:
+        data:
+          required:
+          - email
+          - id
+          - name
+          - provider
+          type: object
+          properties:
+            provider:
+              type: string
+              description: "인증 제공자 (GOOGLE, KAKAO, LOCAL)"
+            name:
+              type: string
+              description: 이름
+            baekjoonId:
+              type: string
+              description: 백준 아이디
+              nullable: true
+            id:
+              type: number
+              description: 유저 ID
+            profileImageUrl:
+              type: string
+              description: 프로필 이미지 URL
+              nullable: true
+            email:
+              type: string
+              description: 이메일
+          description: 응답 데이터
         success:
           type: boolean
-        data:
-          $ref: "#/components/schemas/WorkspaceSettingsResponse"
+          description: 성공 여부
         message:
           type: string
+          description: 메시지
           nullable: true
-
-    ApiResponseWorkspaceMemberResponse:
+    UpdateBoardRequest:
+      title: UpdateBoardRequest
       type: object
       properties:
+        pinned:
+          type: boolean
+          description: 고정 여부
+          nullable: true
+        title:
+          type: string
+          description: 제목
+          nullable: true
+        type:
+          type: string
+          description: 게시글 타입
+          nullable: true
+        content:
+          type: string
+          description: 내용
+          nullable: true
+    ApiResponse-WorkspaceList:
+      title: ApiResponse-WorkspaceList
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - items
+          type: object
+          properties:
+            items:
+              type: array
+              description: 워크스페이스 목록
+              items:
+                required:
+                - id
+                - name
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: 워크스페이스 이름
+                  description:
+                    type: string
+                    description: 워크스페이스 설명
+                    nullable: true
+                  id:
+                    type: number
+                    description: 워크스페이스 ID
+          description: 응답 데이터
         success:
           type: boolean
-        data:
-          $ref: "#/components/schemas/WorkspaceMemberResponse"
+          description: 성공 여부
         message:
           type: string
+          description: 메시지
           nullable: true
-
-    ApiResponseWorkspaceMemberListResponse:
+    CreateWorkspaceRequest:
+      title: CreateWorkspaceRequest
+      required:
+      - name
       type: object
       properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/WorkspaceMemberListResponse"
-        message:
-          type: string
-          nullable: true
-
-    ApiResponsePageResponseWorkspaceResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/PageResponseWorkspaceResponse"
-        message:
-          type: string
-          nullable: true
-
-    ApiResponseProblemResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/ProblemResponse"
-        message:
-          type: string
-          nullable: true
-
-    ApiResponseSubmissionResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/SubmissionResponse"
-        message:
-          type: string
-          nullable: true
-
-    ApiResponseBoardListResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/BoardListResponse"
-        message:
-          type: string
-          nullable: true
-
-    ApiResponseBoardDetailResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/BoardDetailResponse"
-        message:
-          type: string
-          nullable: true
-
-    ApiResponseBoardLikeStatusResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/BoardLikeStatusResponse"
-        message:
-          type: string
-          nullable: true
-
-    ApiResponseCommentListResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/CommentListResponse"
-        message:
-          type: string
-          nullable: true
-
-    ApiResponseCommentResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/CommentResponse"
-        message:
-          type: string
-          nullable: true
-
-    # ──── Auth ────
-    SignupRequest:
-      type: object
-      required: [email, password, name]
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
         name:
           type: string
-
-    LoginRequest:
-      type: object
-      required: [email, password]
-      properties:
-        email:
+          description: 워크스페이스 이름
+        description:
           type: string
+          description: 워크스페이스 설명
+          nullable: true
+    ProblemDetail-NotFound:
+      title: ProblemDetail-NotFound
+      required:
+      - detail
+      - exception
+      - status
+      - timestamp
+      - title
+      - type
+      type: object
+      properties:
+        exception:
+          type: string
+          description: 예외 클래스명
+        instance:
+          type: string
+          description: 오류 인스턴스
+          nullable: true
+        detail:
+          type: string
+          description: 오류 상세 메시지
+        title:
+          type: string
+          description: 에러 코드
+        type:
+          type: string
+          description: 오류 문서 URI
+        timestamp:
+          type: string
+          description: 발생 시각
+        status:
+          type: number
+          description: HTTP 상태 코드
+    SignupRequest:
+      title: SignupRequest
+      required:
+      - email
+      - name
+      - password
+      type: object
+      properties:
         password:
           type: string
-
-    RefreshRequest:
-      type: object
-      required: [refreshToken]
-      properties:
-        refreshToken:
-          type: string
-
-    AuthTokenResponse:
-      type: object
-      properties:
-        accessToken:
-          type: string
-        refreshToken:
-          type: string
-
-    # ──── User ────
-    UserResponse:
-      type: object
-      required: [id, email, name, provider]
-      properties:
-        id:
-          type: number
-          description: 유저 ID
-        email:
-          type: string
-          description: 이메일
+          description: 비밀번호
         name:
           type: string
           description: 이름
-        profileImageUrl:
+        email:
           type: string
-          description: 프로필 이미지 URL
+          description: 이메일
+    ApiResponse-Void:
+      title: ApiResponse-Void
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
           nullable: true
-        provider:
+    PinBoardRequest:
+      title: PinBoardRequest
+      required:
+      - pinned
+      type: object
+      properties:
+        pinned:
+          type: boolean
+          description: 고정 여부
+    ProblemDetail-Validation:
+      title: ProblemDetail-Validation
+      required:
+      - detail
+      - exception
+      - fieldErrors
+      - status
+      - timestamp
+      - title
+      - type
+      type: object
+      properties:
+        exception:
           type: string
-          description: "인증 제공자 (GOOGLE, KAKAO, LOCAL)"
-        baekjoonId:
+          description: 예외 클래스명
+        fieldErrors:
+          type: array
+          description: 필드 오류 목록
+          items:
+            required:
+            - field
+            - message
+            type: object
+            properties:
+              field:
+                type: string
+                description: 필드명
+              message:
+                type: string
+                description: 오류 메시지
+              rejectedValue:
+                type: object
+                description: 거절된 값
+                nullable: true
+        instance:
           type: string
-          description: 백준 아이디
+          description: 오류 인스턴스
           nullable: true
-
+        detail:
+          type: string
+          description: 오류 상세 메시지
+        title:
+          type: string
+          description: 에러 코드
+        type:
+          type: string
+          description: 오류 문서 URI
+        timestamp:
+          type: string
+          description: 발생 시각
+        status:
+          type: number
+          description: HTTP 상태 코드
+    LoginRequest:
+      title: LoginRequest
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        password:
+          type: string
+          description: 비밀번호
+        email:
+          type: string
+          description: 이메일
+    UpdateWorkspaceMemberNicknameRequest:
+      title: UpdateWorkspaceMemberNicknameRequest
+      required:
+      - nickname
+      type: object
+      properties:
+        nickname:
+          type: string
+          description: 닉네임
+    ProblemDetail-MissingParameter:
+      title: ProblemDetail-MissingParameter
+      required:
+      - detail
+      - exception
+      - status
+      - timestamp
+      - title
+      - type
+      type: object
+      properties:
+        exception:
+          type: string
+          description: 예외 클래스명
+        instance:
+          type: string
+          description: 오류 인스턴스
+          nullable: true
+        detail:
+          type: string
+          description: 오류 상세 메시지
+        title:
+          type: string
+          description: 에러 코드
+        type:
+          type: string
+          description: 오류 문서 URI
+        timestamp:
+          type: string
+          description: 발생 시각
+        status:
+          type: number
+          description: HTTP 상태 코드
+    ApiResponse-WorkspaceExplore:
+      title: ApiResponse-WorkspaceExplore
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - content
+          - page
+          type: object
+          properties:
+            page:
+              required:
+              - first
+              - last
+              - page
+              - size
+              - totalElements
+              - totalPages
+              type: object
+              properties:
+                last:
+                  type: boolean
+                  description: 마지막 페이지 여부
+                size:
+                  type: number
+                  description: 페이지 크기
+                totalPages:
+                  type: number
+                  description: 전체 페이지 수
+                page:
+                  type: number
+                  description: 페이지 번호
+                first:
+                  type: boolean
+                  description: 첫 페이지 여부
+                totalElements:
+                  type: number
+                  description: 전체 요소 수
+              description: 페이지 정보
+            content:
+              type: array
+              description: 워크스페이스 목록
+              items:
+                required:
+                - id
+                - name
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: 워크스페이스 이름
+                  description:
+                    type: string
+                    description: 워크스페이스 설명
+                    nullable: true
+                  id:
+                    type: number
+                    description: 워크스페이스 ID
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-BoardDetail:
+      title: ApiResponse-BoardDetail
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          type: object
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-WorkspaceMemberResponse:
+      title: ApiResponse-WorkspaceMemberResponse
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - nickname
+          - role
+          - workspaceMemberId
+          type: object
+          properties:
+            role:
+              type: string
+              description: 권한
+            nickname:
+              type: string
+              description: 닉네임
+            workspaceMemberId:
+              type: number
+              description: 워크스페이스 멤버 ID
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    InviteWorkspaceMemberRequest:
+      title: InviteWorkspaceMemberRequest
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+          description: 초대할 이메일
+    ApiResponse-WorkspaceMemberList:
+      title: ApiResponse-WorkspaceMemberList
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - items
+          type: object
+          properties:
+            items:
+              type: array
+              description: 멤버 목록
+              items:
+                required:
+                - nickname
+                - role
+                - workspaceMemberId
+                type: object
+                properties:
+                  role:
+                    type: string
+                    description: 권한
+                  nickname:
+                    type: string
+                    description: 닉네임
+                  workspaceMemberId:
+                    type: number
+                    description: 워크스페이스 멤버 ID
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    UpdateWorkspaceRequest:
+      title: UpdateWorkspaceRequest
+      type: object
+      properties:
+        mmWebhookUrl:
+          type: string
+          description: MM 웹훅 URL
+          nullable: true
+        name:
+          type: string
+          description: 워크스페이스 이름
+          nullable: true
+        description:
+          type: string
+          description: 워크스페이스 설명
+          nullable: true
+    ApiResponse-CommentList:
+      title: ApiResponse-CommentList
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          type: object
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-WorkspaceSearch:
+      title: ApiResponse-WorkspaceSearch
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - content
+          - page
+          type: object
+          properties:
+            page:
+              required:
+              - first
+              - last
+              - page
+              - size
+              - totalElements
+              - totalPages
+              type: object
+              properties:
+                last:
+                  type: boolean
+                  description: 마지막 페이지 여부
+                size:
+                  type: number
+                  description: 페이지 크기
+                totalPages:
+                  type: number
+                  description: 전체 페이지 수
+                page:
+                  type: number
+                  description: 페이지 번호
+                first:
+                  type: boolean
+                  description: 첫 페이지 여부
+                totalElements:
+                  type: number
+                  description: 전체 요소 수
+              description: 페이지 정보
+            content:
+              type: array
+              description: 워크스페이스 목록
+              items:
+                required:
+                - id
+                - name
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: 워크스페이스 이름
+                  description:
+                    type: string
+                    description: 워크스페이스 설명
+                    nullable: true
+                  id:
+                    type: number
+                    description: 워크스페이스 ID
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-PresignedUrlResponse:
+      title: ApiResponse-PresignedUrlResponse
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - imageUrl
+          - presignedUrl
+          type: object
+          properties:
+            imageUrl:
+              type: string
+              description: 업로드 완료 후 이미지 접근 URL
+            presignedUrl:
+              type: string
+              description: S3 업로드용 Presigned URL
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ProblemDetail-InvalidParameter:
+      title: ProblemDetail-InvalidParameter
+      required:
+      - detail
+      - exception
+      - status
+      - timestamp
+      - title
+      - type
+      type: object
+      properties:
+        exception:
+          type: string
+          description: 예외 클래스명
+        instance:
+          type: string
+          description: 오류 인스턴스
+          nullable: true
+        detail:
+          type: string
+          description: 오류 상세 메시지
+        title:
+          type: string
+          description: 에러 코드
+        type:
+          type: string
+          description: 오류 문서 URI
+        timestamp:
+          type: string
+          description: 발생 시각
+        status:
+          type: number
+          description: HTTP 상태 코드
+    ApiResponse-WorkspaceResponse:
+      title: ApiResponse-WorkspaceResponse
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - id
+          - name
+          type: object
+          properties:
+            name:
+              type: string
+              description: 워크스페이스 이름
+            description:
+              type: string
+              description: 워크스페이스 설명
+              nullable: true
+            id:
+              type: number
+              description: 워크스페이스 ID
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-Comment:
+      title: ApiResponse-Comment
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          type: object
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    CreateBoardRequest:
+      title: CreateBoardRequest
+      required:
+      - content
+      - title
+      - type
+      type: object
+      properties:
+        pinned:
+          type: boolean
+          description: 고정 여부
+          nullable: true
+        title:
+          type: string
+          description: 제목
+        type:
+          type: string
+          description: 게시글 타입
+        content:
+          type: string
+          description: 내용
+    ApiResponse-ProblemResponse:
+      title: ApiResponse-ProblemResponse
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - algorithmTags
+          - id
+          - problemNumber
+          - samples
+          - title
+          type: object
+          properties:
+            timeLimit:
+              type: string
+              description: 시간 제한
+              nullable: true
+            inputDescription:
+              type: string
+              description: 입력 설명
+              nullable: true
+            algorithmTags:
+              type: array
+              description: 알고리즘 태그 목록
+              items:
+                required:
+                - id
+                - name
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: 태그 이름
+                  id:
+                    type: number
+                    description: 태그 ID
+            tier:
+              type: string
+              description: 난이도
+              nullable: true
+            problemNumber:
+              type: number
+              description: 백준 문제 번호
+            description:
+              type: string
+              description: 문제 설명
+              nullable: true
+            memoryLimit:
+              type: string
+              description: 메모리 제한
+              nullable: true
+            id:
+              type: number
+              description: 문제 ID
+            title:
+              type: string
+              description: 문제 제목
+            outputDescription:
+              type: string
+              description: 출력 설명
+              nullable: true
+            samples:
+              type: array
+              description: 입출력 예제 목록
+              items:
+                required:
+                - id
+                - sampleIndex
+                type: object
+                properties:
+                  output:
+                    type: string
+                    description: 예제 출력
+                    nullable: true
+                  input:
+                    type: string
+                    description: 예제 입력
+                    nullable: true
+                  sampleIndex:
+                    type: number
+                    description: 예제 번호
+                  id:
+                    type: number
+                    description: 예제 ID
+            url:
+              type: string
+              description: 백준 문제 URL
+              nullable: true
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ProblemIngestRequest:
+      title: ProblemIngestRequest
+      required:
+      - problemNum
+      - title
+      type: object
+      properties:
+        timeLimit:
+          type: string
+          description: 시간 제한
+          nullable: true
+        tier:
+          type: string
+          description: 난이도
+          nullable: true
+        problemOutput:
+          type: string
+          description: 출력 설명
+          nullable: true
+        memoryLimit:
+          type: string
+          description: 메모리 제한
+          nullable: true
+        problemNum:
+          type: number
+          description: 백준 문제 번호
+        problemInput:
+          type: string
+          description: 입력 설명
+          nullable: true
+        problemDesc:
+          type: string
+          description: 문제 설명
+          nullable: true
+        title:
+          type: string
+          description: 문제 제목
+        samples:
+          type: array
+          description: 입출력 예제 목록
+          items:
+            required:
+            - sampleIndex
+            type: object
+            properties:
+              output:
+                type: string
+                description: 예제 출력
+                nullable: true
+              input:
+                type: string
+                description: 예제 입력
+                nullable: true
+              sampleIndex:
+                type: number
+                description: 예제 번호
+        url:
+          type: string
+          description: 백준 문제 URL
+          nullable: true
+        tags:
+          type: array
+          description: 알고리즘 태그 목록
+          items:
+            required:
+            - name
+            type: object
+            properties:
+              name:
+                type: string
+                description: 태그 이름
     UserUpdateRequest:
+      title: UserUpdateRequest
       type: object
       properties:
         name:
           type: string
           description: 수정할 이름 (30자 이내)
           nullable: true
-        profileImageUrl:
-          type: string
-          description: 수정할 프로필 이미지 URL
-          nullable: true
         baekjoonId:
           type: string
           description: 백준 아이디
           nullable: true
-
-    # ──── Workspace ────
-    WorkspaceResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: 워크스페이스 ID
-        name:
+        profileImageUrl:
           type: string
-          description: 워크스페이스 이름
-        description:
-          type: string
-          description: 워크스페이스 설명
+          description: 수정할 프로필 이미지 URL
           nullable: true
-
-    WorkspaceListResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/WorkspaceResponse"
-
-    WorkspaceSettingsResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        description:
-          type: string
-          nullable: true
-        mmWebhookUrl:
-          type: string
-          description: Mattermost Webhook URL
-          nullable: true
-
-    WorkspaceMemberResponse:
-      type: object
-      properties:
-        workspaceMemberId:
-          type: integer
-          format: int64
-          description: 워크스페이스 멤버 ID
-        nickname:
-          type: string
-          description: 워크스페이스 내 닉네임
-        role:
-          type: string
-          description: "멤버 역할 (OWNER, ADMIN, MEMBER)"
-          enum: [OWNER, ADMIN, MEMBER]
-
-    WorkspaceMemberListResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/WorkspaceMemberResponse"
-
-    PageResponseWorkspaceResponse:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/WorkspaceResponse"
-        page:
-          $ref: "#/components/schemas/PageInfo"
-
-    PageInfo:
-      type: object
-      properties:
-        page:
-          type: integer
-        size:
-          type: integer
-        totalElements:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
-
-    CreateWorkspaceRequest:
-      type: object
-      required: [name]
-      properties:
-        name:
-          type: string
-          description: 워크스페이스 이름
-        description:
-          type: string
-          description: 워크스페이스 설명
-          nullable: true
-
-    UpdateWorkspaceRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          nullable: true
-        description:
-          type: string
-          nullable: true
-        mmWebhookUrl:
-          type: string
-          nullable: true
-
-    InviteWorkspaceMemberRequest:
-      type: object
-      required: [email]
-      properties:
-        email:
-          type: string
-          format: email
-          description: 초대할 사용자 이메일
-
-    UpdateWorkspaceMemberNicknameRequest:
-      type: object
-      required: [nickname]
-      properties:
-        nickname:
-          type: string
-          description: 변경할 닉네임
-
-    UpdateWorkspaceMemberRoleRequest:
-      type: object
-      required: [role]
-      properties:
-        role:
-          type: string
-          enum: [OWNER, ADMIN, MEMBER]
-          description: 변경할 역할
-
-    # ──── Problem ────
-    ProblemResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        problemNumber:
-          type: integer
-          description: 백준 문제 번호
-        title:
-          type: string
-        tier:
-          type: string
-          nullable: true
-        timeLimit:
-          type: string
-          nullable: true
-        memoryLimit:
-          type: string
-          nullable: true
-        description:
-          type: string
-          nullable: true
-        inputDescription:
-          type: string
-          nullable: true
-        outputDescription:
-          type: string
-          nullable: true
-        url:
-          type: string
-          nullable: true
-        samples:
-          type: array
-          items:
-            $ref: "#/components/schemas/SampleResponse"
-        algorithmTags:
-          type: array
-          items:
-            $ref: "#/components/schemas/AlgorithmTagResponse"
-
-    SampleResponse:
-      type: object
-      properties:
-        sampleIndex:
-          type: integer
-        input:
-          type: string
-        output:
-          type: string
-
-    AlgorithmTagResponse:
-      type: object
-      properties:
-        name:
-          type: string
-
-    ProblemIngestRequest:
-      type: object
-      required: [problemNum, title]
-      properties:
-        problemNum:
-          type: integer
-        title:
-          type: string
-        tier:
-          type: string
-          nullable: true
-        timeLimit:
-          type: string
-          nullable: true
-        memoryLimit:
-          type: string
-          nullable: true
-        problemDesc:
-          type: string
-          nullable: true
-        problemInput:
-          type: string
-          nullable: true
-        problemOutput:
-          type: string
-          nullable: true
-        url:
-          type: string
-          nullable: true
-        samples:
-          type: array
-          items:
-            $ref: "#/components/schemas/SampleDto"
-        tags:
-          type: array
-          items:
-            $ref: "#/components/schemas/TagDto"
-
-    SampleDto:
-      type: object
-      properties:
-        sampleIndex:
-          type: integer
-        input:
-          type: string
-        output:
-          type: string
-
-    TagDto:
-      type: object
-      properties:
-        name:
-          type: string
-
-    # ──── Submission ────
-    SubmissionResponse:
-      type: object
-      required: [id, baekjoonSubmissionId, problemNumber, username, verdict]
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: 제출 ID
-        baekjoonSubmissionId:
-          type: integer
-          format: int64
-          description: 백준 제출 ID
-        problemNumber:
-          type: integer
-          description: 백준 문제 번호
-        username:
-          type: string
-          description: 백준 사용자명
-        verdict:
-          type: string
-          description: "채점 결과 (맞았습니다!!, 틀렸습니다, 시간 초과 등)"
-        executionTime:
-          type: string
-          description: 실행 시간
-          nullable: true
-        memory:
-          type: string
-          description: 메모리 사용량
-          nullable: true
-        language:
-          type: string
-          description: 프로그래밍 언어
-          nullable: true
-        codeLength:
-          type: string
-          description: 코드 길이
-          nullable: true
-
-    SubmissionIngestRequest:
-      type: object
-      required: [submissionId, problemNum, username, verdict]
-      properties:
-        submissionId:
-          type: integer
-          format: int64
-          description: 백준 제출 ID
-        problemNum:
-          type: integer
-          description: 백준 문제 번호
-        username:
-          type: string
-          description: 백준 사용자명
-        verdict:
-          type: string
-          description: 채점 결과
-        time:
-          type: string
-          description: 실행 시간
-          nullable: true
-        memory:
-          type: string
-          description: 메모리 사용량
-          nullable: true
-        language:
-          type: string
-          description: 프로그래밍 언어
-          nullable: true
-        codeLength:
-          type: string
-          description: 코드 길이
-          nullable: true
-        code:
-          type: string
-          description: 소스 코드
-          nullable: true
-
-    # ──── Board ────
-    BoardType:
-      type: string
-      enum: [FREE, NOTICE, QNA, DATA]
-      description: "게시글 유형 (FREE=자유, NOTICE=공지, QNA=질문, DATA=자료)"
-
-    BoardAuthorResponse:
-      type: object
-      properties:
-        workspaceMemberId:
-          type: integer
-          format: int64
-          description: 워크스페이스 멤버 ID
-        nickname:
-          type: string
-          description: 닉네임
-
-    BoardListItemResponse:
-      type: object
-      properties:
-        boardId:
-          type: integer
-          format: int64
-          description: 게시글 ID
-        workspaceId:
-          type: integer
-          format: int64
-          description: 워크스페이스 ID
-        type:
-          $ref: "#/components/schemas/BoardType"
-        pinned:
-          type: boolean
-          description: 상단 고정 여부
-        title:
-          type: string
-          description: 게시글 제목
-        preview:
-          type: string
-          description: 본문 미리보기
-        viewCount:
-          type: integer
-          format: int64
-          description: 조회수
-        likeCount:
-          type: integer
-          format: int64
-          description: 추천수
-        commentCount:
-          type: integer
-          format: int64
-          description: 댓글수
-        myLike:
-          type: boolean
-          description: 내 추천 여부
-        author:
-          $ref: "#/components/schemas/BoardAuthorResponse"
-        createdAt:
-          type: string
-          format: date-time
-          description: 작성일시
-        updatedAt:
-          type: string
-          format: date-time
-          description: 수정일시
-
-    BoardListResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/BoardListItemResponse"
-        page:
-          $ref: "#/components/schemas/PageInfo"
-
-    BoardDetailResponse:
-      type: object
-      properties:
-        boardId:
-          type: integer
-          format: int64
-          description: 게시글 ID
-        workspaceId:
-          type: integer
-          format: int64
-          description: 워크스페이스 ID
-        type:
-          $ref: "#/components/schemas/BoardType"
-        pinned:
-          type: boolean
-          description: 상단 고정 여부
-        title:
-          type: string
-          description: 게시글 제목
-        content:
-          type: string
-          description: 게시글 본문 (마크다운)
-        viewCount:
-          type: integer
-          format: int64
-          description: 조회수
-        likeCount:
-          type: integer
-          format: int64
-          description: 추천수
-        commentCount:
-          type: integer
-          format: int64
-          description: 댓글수
-        myLike:
-          type: boolean
-          description: 내 추천 여부
-        author:
-          $ref: "#/components/schemas/BoardAuthorResponse"
-        createdAt:
-          type: string
-          format: date-time
-          description: 작성일시
-        updatedAt:
-          type: string
-          format: date-time
-          description: 수정일시
-
-    BoardLikeStatusResponse:
-      type: object
-      properties:
-        likeCount:
-          type: integer
-          format: int64
-          description: 추천수
-        myLike:
-          type: boolean
-          description: 내 추천 여부
-
-    CreateBoardRequest:
-      type: object
-      required: [type, title, content]
-      properties:
-        type:
-          $ref: "#/components/schemas/BoardType"
-        title:
-          type: string
-          description: 게시글 제목
-        content:
-          type: string
-          description: 게시글 본문 (마크다운)
-        pinned:
-          type: boolean
-          description: 상단 고정 여부
-          nullable: true
-
-    UpdateBoardRequest:
-      type: object
-      properties:
-        type:
-          $ref: "#/components/schemas/BoardType"
-        title:
-          type: string
-          nullable: true
-        content:
-          type: string
-          nullable: true
-        pinned:
-          type: boolean
-          nullable: true
-
-    PinBoardRequest:
-      type: object
-      required: [pinned]
-      properties:
-        pinned:
-          type: boolean
-          description: 고정 여부
-
-    CommentResponse:
-      type: object
-      properties:
-        boardCommentId:
-          type: integer
-          format: int64
-          description: 댓글 ID
-        boardId:
-          type: integer
-          format: int64
-          description: 게시글 ID
-        content:
-          type: string
-          description: 댓글 내용
-        author:
-          $ref: "#/components/schemas/BoardAuthorResponse"
-        createdAt:
-          type: string
-          format: date-time
-          description: 작성일시
-
-    CommentListResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/CommentResponse"
-        page:
-          $ref: "#/components/schemas/PageInfo"
-
-    CreateCommentRequest:
-      type: object
-      required: [content]
-      properties:
-        content:
-          type: string
-          description: 댓글 내용
