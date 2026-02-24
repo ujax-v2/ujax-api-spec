@@ -9,6 +9,7 @@ tags:
 - name: Auth
 - name: User
 - name: Workspace
+- name: Board
 - name: Problem
 - name: Submission
 paths:
@@ -430,6 +431,339 @@ paths:
         "204":
           description: "204"
 
+  # ──────────────── Board ────────────────
+  /api/v1/workspaces/{workspaceId}/boards:
+    get:
+      tags: [Board]
+      summary: 게시글 목록 조회
+      operationId: board-list
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [FREE, NOTICE, QNA, DATA]
+        - name: keyword
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: pinnedFirst
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBoardListResponse"
+    post:
+      tags: [Board]
+      summary: 게시글 작성
+      operationId: board-create
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBoardRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBoardDetailResponse"
+
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}:
+    get:
+      tags: [Board]
+      summary: 게시글 상세 조회
+      operationId: board-get
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBoardDetailResponse"
+    patch:
+      tags: [Board]
+      summary: 게시글 수정
+      operationId: board-update
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBoardRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBoardDetailResponse"
+    delete:
+      tags: [Board]
+      summary: 게시글 삭제
+      operationId: board-delete
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "204"
+
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}/pin:
+    patch:
+      tags: [Board]
+      summary: 게시글 고정/해제
+      operationId: board-pin
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PinBoardRequest"
+      responses:
+        "200":
+          description: "200"
+
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}/likes:
+    put:
+      tags: [Board]
+      summary: 게시글 추천
+      operationId: board-like
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+    get:
+      tags: [Board]
+      summary: 게시글 추천 상태 조회
+      operationId: board-like-status
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBoardLikeStatusResponse"
+    delete:
+      tags: [Board]
+      summary: 게시글 추천 취소
+      operationId: board-unlike
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "200"
+
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}/comments:
+    get:
+      tags: [Board]
+      summary: 댓글 목록 조회
+      operationId: board-comment-list
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseCommentListResponse"
+    post:
+      tags: [Board]
+      summary: 댓글 작성
+      operationId: board-comment-create
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentRequest"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseCommentResponse"
+
+  /api/v1/workspaces/{workspaceId}/boards/{boardId}/comments/{commentId}:
+    delete:
+      tags: [Board]
+      summary: 댓글 삭제
+      operationId: board-comment-delete
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "204"
+
   # ──────────────── Problem ────────────────
   /api/v1/problems/{problemId}:
     get:
@@ -636,6 +970,61 @@ components:
           type: boolean
         data:
           $ref: "#/components/schemas/SubmissionResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseBoardListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/BoardListResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseBoardDetailResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/BoardDetailResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseBoardLikeStatusResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/BoardLikeStatusResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseCommentListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/CommentListResponse"
+        message:
+          type: string
+          nullable: true
+
+    ApiResponseCommentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/CommentResponse"
         message:
           type: string
           nullable: true
@@ -1044,3 +1433,216 @@ components:
           type: string
           description: 소스 코드
           nullable: true
+
+    # ──── Board ────
+    BoardType:
+      type: string
+      enum: [FREE, NOTICE, QNA, DATA]
+      description: "게시글 유형 (FREE=자유, NOTICE=공지, QNA=질문, DATA=자료)"
+
+    BoardAuthorResponse:
+      type: object
+      properties:
+        workspaceMemberId:
+          type: integer
+          format: int64
+          description: 워크스페이스 멤버 ID
+        nickname:
+          type: string
+          description: 닉네임
+
+    BoardListItemResponse:
+      type: object
+      properties:
+        boardId:
+          type: integer
+          format: int64
+          description: 게시글 ID
+        workspaceId:
+          type: integer
+          format: int64
+          description: 워크스페이스 ID
+        type:
+          $ref: "#/components/schemas/BoardType"
+        pinned:
+          type: boolean
+          description: 상단 고정 여부
+        title:
+          type: string
+          description: 게시글 제목
+        preview:
+          type: string
+          description: 본문 미리보기
+        viewCount:
+          type: integer
+          format: int64
+          description: 조회수
+        likeCount:
+          type: integer
+          format: int64
+          description: 추천수
+        commentCount:
+          type: integer
+          format: int64
+          description: 댓글수
+        myLike:
+          type: boolean
+          description: 내 추천 여부
+        author:
+          $ref: "#/components/schemas/BoardAuthorResponse"
+        createdAt:
+          type: string
+          format: date-time
+          description: 작성일시
+        updatedAt:
+          type: string
+          format: date-time
+          description: 수정일시
+
+    BoardListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoardListItemResponse"
+        page:
+          $ref: "#/components/schemas/PageInfo"
+
+    BoardDetailResponse:
+      type: object
+      properties:
+        boardId:
+          type: integer
+          format: int64
+          description: 게시글 ID
+        workspaceId:
+          type: integer
+          format: int64
+          description: 워크스페이스 ID
+        type:
+          $ref: "#/components/schemas/BoardType"
+        pinned:
+          type: boolean
+          description: 상단 고정 여부
+        title:
+          type: string
+          description: 게시글 제목
+        content:
+          type: string
+          description: 게시글 본문 (마크다운)
+        viewCount:
+          type: integer
+          format: int64
+          description: 조회수
+        likeCount:
+          type: integer
+          format: int64
+          description: 추천수
+        commentCount:
+          type: integer
+          format: int64
+          description: 댓글수
+        myLike:
+          type: boolean
+          description: 내 추천 여부
+        author:
+          $ref: "#/components/schemas/BoardAuthorResponse"
+        createdAt:
+          type: string
+          format: date-time
+          description: 작성일시
+        updatedAt:
+          type: string
+          format: date-time
+          description: 수정일시
+
+    BoardLikeStatusResponse:
+      type: object
+      properties:
+        likeCount:
+          type: integer
+          format: int64
+          description: 추천수
+        myLike:
+          type: boolean
+          description: 내 추천 여부
+
+    CreateBoardRequest:
+      type: object
+      required: [type, title, content]
+      properties:
+        type:
+          $ref: "#/components/schemas/BoardType"
+        title:
+          type: string
+          description: 게시글 제목
+        content:
+          type: string
+          description: 게시글 본문 (마크다운)
+        pinned:
+          type: boolean
+          description: 상단 고정 여부
+          nullable: true
+
+    UpdateBoardRequest:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/BoardType"
+        title:
+          type: string
+          nullable: true
+        content:
+          type: string
+          nullable: true
+        pinned:
+          type: boolean
+          nullable: true
+
+    PinBoardRequest:
+      type: object
+      required: [pinned]
+      properties:
+        pinned:
+          type: boolean
+          description: 고정 여부
+
+    CommentResponse:
+      type: object
+      properties:
+        boardCommentId:
+          type: integer
+          format: int64
+          description: 댓글 ID
+        boardId:
+          type: integer
+          format: int64
+          description: 게시글 ID
+        content:
+          type: string
+          description: 댓글 내용
+        author:
+          $ref: "#/components/schemas/BoardAuthorResponse"
+        createdAt:
+          type: string
+          format: date-time
+          description: 작성일시
+
+    CommentListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommentResponse"
+        page:
+          $ref: "#/components/schemas/PageInfo"
+
+    CreateCommentRequest:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          description: 댓글 내용

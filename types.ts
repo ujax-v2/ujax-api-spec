@@ -291,6 +291,114 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/workspaces/{workspaceId}/boards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 게시글 목록 조회 */
+        get: operations["board-list"];
+        put?: never;
+        /** 게시글 작성 */
+        post: operations["board-create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/boards/{boardId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 게시글 상세 조회 */
+        get: operations["board-get"];
+        put?: never;
+        post?: never;
+        /** 게시글 삭제 */
+        delete: operations["board-delete"];
+        options?: never;
+        head?: never;
+        /** 게시글 수정 */
+        patch: operations["board-update"];
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/boards/{boardId}/pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 게시글 고정/해제 */
+        patch: operations["board-pin"];
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/boards/{boardId}/likes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 게시글 추천 상태 조회 */
+        get: operations["board-like-status"];
+        /** 게시글 추천 */
+        put: operations["board-like"];
+        post?: never;
+        /** 게시글 추천 취소 */
+        delete: operations["board-unlike"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/boards/{boardId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 댓글 목록 조회 */
+        get: operations["board-comment-list"];
+        put?: never;
+        /** 댓글 작성 */
+        post: operations["board-comment-create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/boards/{boardId}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 댓글 삭제 */
+        delete: operations["board-comment-delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/problems/{problemId}": {
         parameters: {
             query?: never;
@@ -428,6 +536,31 @@ export interface components {
         ApiResponseSubmissionResponse: {
             success?: boolean;
             data?: components["schemas"]["SubmissionResponse"];
+            message?: string | null;
+        };
+        ApiResponseBoardListResponse: {
+            success?: boolean;
+            data?: components["schemas"]["BoardListResponse"];
+            message?: string | null;
+        };
+        ApiResponseBoardDetailResponse: {
+            success?: boolean;
+            data?: components["schemas"]["BoardDetailResponse"];
+            message?: string | null;
+        };
+        ApiResponseBoardLikeStatusResponse: {
+            success?: boolean;
+            data?: components["schemas"]["BoardLikeStatusResponse"];
+            message?: string | null;
+        };
+        ApiResponseCommentListResponse: {
+            success?: boolean;
+            data?: components["schemas"]["CommentListResponse"];
+            message?: string | null;
+        };
+        ApiResponseCommentResponse: {
+            success?: boolean;
+            data?: components["schemas"]["CommentResponse"];
             message?: string | null;
         };
         SignupRequest: {
@@ -641,6 +774,174 @@ export interface components {
             codeLength?: string | null;
             /** @description 소스 코드 */
             code?: string | null;
+        };
+        /**
+         * @description 게시글 유형 (FREE=자유, NOTICE=공지, QNA=질문, DATA=자료)
+         * @enum {string}
+         */
+        BoardType: "FREE" | "NOTICE" | "QNA" | "DATA";
+        BoardAuthorResponse: {
+            /**
+             * Format: int64
+             * @description 워크스페이스 멤버 ID
+             */
+            workspaceMemberId?: number;
+            /** @description 닉네임 */
+            nickname?: string;
+        };
+        BoardListItemResponse: {
+            /**
+             * Format: int64
+             * @description 게시글 ID
+             */
+            boardId?: number;
+            /**
+             * Format: int64
+             * @description 워크스페이스 ID
+             */
+            workspaceId?: number;
+            type?: components["schemas"]["BoardType"];
+            /** @description 상단 고정 여부 */
+            pinned?: boolean;
+            /** @description 게시글 제목 */
+            title?: string;
+            /** @description 본문 미리보기 */
+            preview?: string;
+            /**
+             * Format: int64
+             * @description 조회수
+             */
+            viewCount?: number;
+            /**
+             * Format: int64
+             * @description 추천수
+             */
+            likeCount?: number;
+            /**
+             * Format: int64
+             * @description 댓글수
+             */
+            commentCount?: number;
+            /** @description 내 추천 여부 */
+            myLike?: boolean;
+            author?: components["schemas"]["BoardAuthorResponse"];
+            /**
+             * Format: date-time
+             * @description 작성일시
+             */
+            createdAt?: string;
+            /**
+             * Format: date-time
+             * @description 수정일시
+             */
+            updatedAt?: string;
+        };
+        BoardListResponse: {
+            items?: components["schemas"]["BoardListItemResponse"][];
+            page?: components["schemas"]["PageInfo"];
+        };
+        BoardDetailResponse: {
+            /**
+             * Format: int64
+             * @description 게시글 ID
+             */
+            boardId?: number;
+            /**
+             * Format: int64
+             * @description 워크스페이스 ID
+             */
+            workspaceId?: number;
+            type?: components["schemas"]["BoardType"];
+            /** @description 상단 고정 여부 */
+            pinned?: boolean;
+            /** @description 게시글 제목 */
+            title?: string;
+            /** @description 게시글 본문 (마크다운) */
+            content?: string;
+            /**
+             * Format: int64
+             * @description 조회수
+             */
+            viewCount?: number;
+            /**
+             * Format: int64
+             * @description 추천수
+             */
+            likeCount?: number;
+            /**
+             * Format: int64
+             * @description 댓글수
+             */
+            commentCount?: number;
+            /** @description 내 추천 여부 */
+            myLike?: boolean;
+            author?: components["schemas"]["BoardAuthorResponse"];
+            /**
+             * Format: date-time
+             * @description 작성일시
+             */
+            createdAt?: string;
+            /**
+             * Format: date-time
+             * @description 수정일시
+             */
+            updatedAt?: string;
+        };
+        BoardLikeStatusResponse: {
+            /**
+             * Format: int64
+             * @description 추천수
+             */
+            likeCount?: number;
+            /** @description 내 추천 여부 */
+            myLike?: boolean;
+        };
+        CreateBoardRequest: {
+            type: components["schemas"]["BoardType"];
+            /** @description 게시글 제목 */
+            title: string;
+            /** @description 게시글 본문 (마크다운) */
+            content: string;
+            /** @description 상단 고정 여부 */
+            pinned?: boolean | null;
+        };
+        UpdateBoardRequest: {
+            type?: components["schemas"]["BoardType"];
+            title?: string | null;
+            content?: string | null;
+            pinned?: boolean | null;
+        };
+        PinBoardRequest: {
+            /** @description 고정 여부 */
+            pinned: boolean;
+        };
+        CommentResponse: {
+            /**
+             * Format: int64
+             * @description 댓글 ID
+             */
+            boardCommentId?: number;
+            /**
+             * Format: int64
+             * @description 게시글 ID
+             */
+            boardId?: number;
+            /** @description 댓글 내용 */
+            content?: string;
+            author?: components["schemas"]["BoardAuthorResponse"];
+            /**
+             * Format: date-time
+             * @description 작성일시
+             */
+            createdAt?: string;
+        };
+        CommentListResponse: {
+            items?: components["schemas"]["CommentResponse"][];
+            page?: components["schemas"]["PageInfo"];
+        };
+        CreateCommentRequest: {
+            /** @description 댓글 내용 */
+            content: string;
         };
     };
     responses: never;
@@ -1134,6 +1435,297 @@ export interface operations {
             path: {
                 workspaceId: number;
                 workspaceMemberId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 204 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "board-list": {
+        parameters: {
+            query?: {
+                type?: "FREE" | "NOTICE" | "QNA" | "DATA";
+                keyword?: string;
+                page?: number;
+                size?: number;
+                sort?: string;
+                pinnedFirst?: boolean;
+            };
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseBoardListResponse"];
+                };
+            };
+        };
+    };
+    "board-create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CreateBoardRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseBoardDetailResponse"];
+                };
+            };
+        };
+    };
+    "board-get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseBoardDetailResponse"];
+                };
+            };
+        };
+    };
+    "board-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 204 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "board-update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateBoardRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseBoardDetailResponse"];
+                };
+            };
+        };
+    };
+    "board-pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PinBoardRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "board-like-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseBoardLikeStatusResponse"];
+                };
+            };
+        };
+    };
+    "board-like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "board-unlike": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "board-comment-list": {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseCommentListResponse"];
+                };
+            };
+        };
+    };
+    "board-comment-create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseCommentResponse"];
+                };
+            };
+        };
+    };
+    "board-comment-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: number;
+                boardId: number;
+                commentId: number;
             };
             cookie?: never;
         };
