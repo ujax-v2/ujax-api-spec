@@ -51,7 +51,7 @@ paths:
                       "detail" : "잘못된 요청 형식입니다.",
                       "instance" : "/api/v1/workspaces",
                       "exception" : "MethodArgumentNotValidException",
-                      "timestamp" : "2026-02-25T12:58:59.97093",
+                      "timestamp" : "2026-02-25T17:22:18.577117",
                       "fieldErrors" : [ {
                         "field" : "name",
                         "rejectedValue" : "",
@@ -524,7 +524,7 @@ paths:
                       "detail" : "파라미터 'page'의 타입이 올바르지 않습니다. (기대 타입: int)",
                       "instance" : "/api/v1/workspaces/explore",
                       "exception" : "MethodArgumentTypeMismatchException",
-                      "timestamp" : "2026-02-25T12:58:59.922524"
+                      "timestamp" : "2026-02-25T17:22:18.535833"
                     }
   /api/v1/workspaces/me:
     get:
@@ -606,7 +606,7 @@ paths:
                       "detail" : "워크스페이스를 찾을 수 없습니다.",
                       "instance" : "/api/v1/workspaces/999",
                       "exception" : "NotFoundException",
-                      "timestamp" : "2026-02-25T12:59:00.178822"
+                      "timestamp" : "2026-02-25T17:22:19.005902"
                     }
         "200":
           description: "200"
@@ -670,7 +670,7 @@ paths:
                       "detail" : "소유자만 이 작업을 수행할 수 있습니다.",
                       "instance" : "/api/v1/workspaces/1",
                       "exception" : "ForbiddenException",
-                      "timestamp" : "2026-02-25T12:58:59.985065"
+                      "timestamp" : "2026-02-25T17:22:18.590684"
                     }
     patch:
       tags:
@@ -740,7 +740,7 @@ paths:
                       "detail" : "잘못된 요청 형식입니다.",
                       "instance" : "/api/v1/workspaces/1",
                       "exception" : "BadRequestException",
-                      "timestamp" : "2026-02-25T12:58:59.878624"
+                      "timestamp" : "2026-02-25T17:22:18.504473"
                     }
   /api/v1/problems/number/{problemNumber}:
     get:
@@ -878,8 +878,8 @@ paths:
                             "workspaceMemberId" : 3,
                             "nickname" : "작성자"
                           },
-                          "createdAt" : "2026-02-25T12:58:59.020303",
-                          "updatedAt" : "2026-02-25T12:58:59.020316"
+                          "createdAt" : "2026-02-25T17:22:17.16584",
+                          "updatedAt" : "2026-02-25T17:22:17.165854"
                         } ],
                         "page" : {
                           "page" : 0,
@@ -946,8 +946,8 @@ paths:
                           "workspaceMemberId" : 3,
                           "nickname" : "작성자"
                         },
-                        "createdAt" : "2026-02-25T12:58:58.944528",
-                        "updatedAt" : "2026-02-25T12:58:58.94454"
+                        "createdAt" : "2026-02-25T17:22:17.10347",
+                        "updatedAt" : "2026-02-25T17:22:17.103483"
                       },
                       "message" : null
                     }
@@ -982,7 +982,7 @@ paths:
                       "detail" : "워크스페이스에 소속된 멤버가 아닙니다.",
                       "instance" : "/api/v1/workspaces/1/members",
                       "exception" : "ForbiddenException",
-                      "timestamp" : "2026-02-25T12:58:59.93463"
+                      "timestamp" : "2026-02-25T17:22:18.549169"
                     }
         "200":
           description: "200"
@@ -1003,6 +1003,178 @@ paths:
                         } ]
                       },
                       "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/problem-boxes:
+    get:
+      tags:
+      - ProblemBox
+      summary: 문제집 목록 조회
+      description: 워크스페이스의 문제집 목록을 페이징 조회합니다
+      operationId: problem-box-list
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: 페이지 번호
+        required: false
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: 페이지 크기
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-ProblemBoxList"
+              examples:
+                problem-box-list:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "content" : [ {
+                          "id" : 1,
+                          "title" : "문제집",
+                          "createdAt" : "2026-02-25T17:22:17.694392",
+                          "updatedAt" : "2026-02-25T17:22:17.694392"
+                        } ],
+                        "page" : {
+                          "page" : 0,
+                          "size" : 9,
+                          "totalElements" : 1,
+                          "totalPages" : 1,
+                          "first" : true,
+                          "last" : true
+                        }
+                      },
+                      "message" : null
+                    }
+        "403":
+          description: "403"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                problem-box-list-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A013",
+                      "status" : 403,
+                      "detail" : "워크스페이스에 소속된 멤버가 아닙니다.",
+                      "instance" : "/api/v1/workspaces/1/problem-boxes",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-25T17:22:17.588531"
+                    }
+    post:
+      tags:
+      - ProblemBox
+      summary: 문제집 생성
+      description: 문제집 생성
+      operationId: problem-box-create
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/CreateProblemBoxRequest"
+            examples:
+              problem-box-create-error:
+                value: |-
+                  {
+                    "title" : "",
+                    "description" : "설명"
+                  }
+              problem-box-create:
+                value: |-
+                  {
+                    "title" : "문제집",
+                    "description" : "설명"
+                  }
+              problem-box-create-forbidden:
+                value: |-
+                  {
+                    "title" : "문제집",
+                    "description" : "설명"
+                  }
+      responses:
+        "400":
+          description: "400"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Validation"
+              examples:
+                problem-box-create-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C001",
+                      "status" : 400,
+                      "detail" : "잘못된 요청 형식입니다.",
+                      "instance" : "/api/v1/workspaces/1/problem-boxes",
+                      "exception" : "MethodArgumentNotValidException",
+                      "timestamp" : "2026-02-25T17:22:17.655768",
+                      "fieldErrors" : [ {
+                        "field" : "title",
+                        "rejectedValue" : "",
+                        "message" : "must not be blank"
+                      } ]
+                    }
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-ProblemBoxResponse"
+              examples:
+                problem-box-create:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "title" : "문제집",
+                        "description" : "설명",
+                        "createdAt" : "2026-02-25T17:22:17.681745"
+                      },
+                      "message" : null
+                    }
+        "403":
+          description: "403"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                problem-box-create-forbidden:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A012",
+                      "status" : 403,
+                      "detail" : "워크스페이스에 대한 권한이 없습니다.",
+                      "instance" : "/api/v1/workspaces/1/problem-boxes",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-25T17:22:17.670392"
                     }
   /api/v1/workspaces/{workspaceId}/settings:
     get:
@@ -1035,7 +1207,7 @@ paths:
                       "detail" : "소유자만 이 작업을 수행할 수 있습니다.",
                       "instance" : "/api/v1/workspaces/1/settings",
                       "exception" : "ForbiddenException",
-                      "timestamp" : "2026-02-25T12:59:00.204646"
+                      "timestamp" : "2026-02-25T17:22:19.031208"
                     }
         "200":
           description: "200"
@@ -1141,8 +1313,8 @@ paths:
                           "workspaceMemberId" : 3,
                           "nickname" : "작성자"
                         },
-                        "createdAt" : "2026-02-25T12:58:59.116382",
-                        "updatedAt" : "2026-02-25T12:58:59.116394"
+                        "createdAt" : "2026-02-25T17:22:17.244356",
+                        "updatedAt" : "2026-02-25T17:22:17.244368"
                       },
                       "message" : null
                     }
@@ -1240,8 +1412,8 @@ paths:
                           "workspaceMemberId" : 3,
                           "nickname" : "작성자"
                         },
-                        "createdAt" : "2026-02-25T12:58:58.898631",
-                        "updatedAt" : "2026-02-25T12:58:58.898643"
+                        "createdAt" : "2026-02-25T17:22:17.068821",
+                        "updatedAt" : "2026-02-25T17:22:17.068832"
                       },
                       "message" : null
                     }
@@ -1292,7 +1464,7 @@ paths:
                       "detail" : "잘못된 요청 형식입니다.",
                       "instance" : "/api/v1/workspaces/1/members/invite",
                       "exception" : "MethodArgumentNotValidException",
-                      "timestamp" : "2026-02-25T12:58:59.999493",
+                      "timestamp" : "2026-02-25T17:22:18.605758",
                       "fieldErrors" : [ {
                         "field" : "email",
                         "rejectedValue" : "invalid-email",
@@ -1344,7 +1516,7 @@ paths:
                       "detail" : "워크스페이스에 소속된 멤버가 아닙니다.",
                       "instance" : "/api/v1/workspaces/1/members/me",
                       "exception" : "ForbiddenException",
-                      "timestamp" : "2026-02-25T12:59:00.160535"
+                      "timestamp" : "2026-02-25T17:22:18.953086"
                     }
         "200":
           description: "200"
@@ -1394,7 +1566,7 @@ paths:
                       "detail" : "워크스페이스에 대한 권한이 없습니다.",
                       "instance" : "/api/v1/workspaces/1/members/me",
                       "exception" : "ForbiddenException",
-                      "timestamp" : "2026-02-25T12:59:00.190122"
+                      "timestamp" : "2026-02-25T17:22:19.01936"
                     }
         "200":
           description: "200"
@@ -1447,7 +1619,7 @@ paths:
                       "detail" : "워크스페이스에 대한 권한이 없습니다.",
                       "instance" : "/api/v1/workspaces/1/members/2",
                       "exception" : "ForbiddenException",
-                      "timestamp" : "2026-02-25T12:58:59.909759"
+                      "timestamp" : "2026-02-25T17:22:18.521237"
                     }
         "200":
           description: "200"
@@ -1462,6 +1634,196 @@ paths:
                       "success" : true,
                       "data" : null,
                       "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}:
+    get:
+      tags:
+      - ProblemBox
+      summary: 문제집 단건 조회
+      description: 문제집 상세 정보를 조회합니다
+      operationId: problem-box-get
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        description: 문제집 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-ProblemBoxResponse"
+              examples:
+                problem-box-get:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "title" : "문제집",
+                        "description" : "설명",
+                        "createdAt" : "2026-02-25T17:22:17.601014"
+                      },
+                      "message" : null
+                    }
+        "404":
+          description: "404"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-NotFound"
+              examples:
+                problem-box-get-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "R009",
+                      "status" : 404,
+                      "detail" : "문제집을 찾을 수 없습니다.",
+                      "instance" : "/api/v1/workspaces/1/problem-boxes/999",
+                      "exception" : "NotFoundException",
+                      "timestamp" : "2026-02-25T17:22:17.624013"
+                    }
+    delete:
+      tags:
+      - ProblemBox
+      summary: 문제집 삭제
+      description: 문제집을 삭제합니다 (OWNER/MANAGER 전용)
+      operationId: problem-box-delete
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        description: 문제집 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                problem-box-delete:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
+        "403":
+          description: "403"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Forbidden"
+              examples:
+                problem-box-delete-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "A012",
+                      "status" : 403,
+                      "detail" : "워크스페이스에 대한 권한이 없습니다.",
+                      "instance" : "/api/v1/workspaces/1/problem-boxes/1",
+                      "exception" : "ForbiddenException",
+                      "timestamp" : "2026-02-25T17:22:17.638332"
+                    }
+    patch:
+      tags:
+      - ProblemBox
+      summary: 문제집 수정
+      description: 문제집 제목/설명을 수정합니다 (OWNER/MANAGER 전용)
+      operationId: problem-box-update
+      parameters:
+      - name: workspaceId
+        in: path
+        description: 워크스페이스 ID
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        description: 문제집 ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/UpdateProblemBoxRequest"
+            examples:
+              problem-box-update:
+                value: |-
+                  {
+                    "title" : "새 제목",
+                    "description" : "새 설명"
+                  }
+              problem-box-update-error:
+                value: |-
+                  {
+                    "title" : "",
+                    "description" : "설명"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-ProblemBoxResponse"
+              examples:
+                problem-box-update:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "title" : "새 제목",
+                        "description" : "새 설명",
+                        "createdAt" : "2026-02-25T17:22:17.566143"
+                      },
+                      "message" : null
+                    }
+        "400":
+          description: "400"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail-Validation"
+              examples:
+                problem-box-update-error:
+                  value: |-
+                    {
+                      "type" : "/docs/index.html#error-code-list",
+                      "title" : "C001",
+                      "status" : 400,
+                      "detail" : "잘못된 요청 형식입니다.",
+                      "instance" : "/api/v1/workspaces/1/problem-boxes/1",
+                      "exception" : "MethodArgumentNotValidException",
+                      "timestamp" : "2026-02-25T17:22:17.517282",
+                      "fieldErrors" : [ {
+                        "field" : "title",
+                        "rejectedValue" : "",
+                        "message" : "must not be blank"
+                      } ]
                     }
   /api/v1/workspaces/{workspaceId}/boards/{boardId}/comments:
     get:
@@ -1516,7 +1878,7 @@ paths:
                             "workspaceMemberId" : 3,
                             "nickname" : "작성자"
                           },
-                          "createdAt" : "2026-02-25T12:58:59.08046"
+                          "createdAt" : "2026-02-25T17:22:17.21457"
                         } ],
                         "page" : {
                           "page" : 0,
@@ -1579,7 +1941,7 @@ paths:
                           "workspaceMemberId" : 3,
                           "nickname" : "작성자"
                         },
-                        "createdAt" : "2026-02-25T12:58:58.855632"
+                        "createdAt" : "2026-02-25T17:22:17.034342"
                       },
                       "message" : null
                     }
@@ -1782,7 +2144,7 @@ paths:
                       "detail" : "잘못된 요청 형식입니다.",
                       "instance" : "/api/v1/workspaces/1/members/me/nickname",
                       "exception" : "MethodArgumentNotValidException",
-                      "timestamp" : "2026-02-25T12:59:00.100393",
+                      "timestamp" : "2026-02-25T17:22:18.722242",
                       "fieldErrors" : [ {
                         "field" : "nickname",
                         "rejectedValue" : "",
@@ -1871,7 +2233,7 @@ paths:
                       "detail" : "잘못된 요청 형식입니다.",
                       "instance" : "/api/v1/workspaces/1/members/2/role",
                       "exception" : "MethodArgumentNotValidException",
-                      "timestamp" : "2026-02-25T12:59:00.047014",
+                      "timestamp" : "2026-02-25T17:22:18.650771",
                       "fieldErrors" : [ {
                         "field" : "role",
                         "rejectedValue" : null,
@@ -2132,6 +2494,23 @@ components:
           type: string
           description: 메시지
           nullable: true
+    ApiResponse-BoardList:
+      title: ApiResponse-BoardList
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          type: object
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
     UpdateBoardRequest:
       title: UpdateBoardRequest
       type: object
@@ -2152,22 +2531,18 @@ components:
           type: string
           description: 내용
           nullable: true
-    ApiResponse-BoardList:
-      title: ApiResponse-BoardList
+    CreateWorkspaceRequest:
+      title: CreateWorkspaceRequest
       required:
-      - data
-      - success
+      - name
       type: object
       properties:
-        data:
-          type: object
-          description: 응답 데이터
-        success:
-          type: boolean
-          description: 성공 여부
-        message:
+        name:
           type: string
-          description: 메시지
+          description: 워크스페이스 이름
+        description:
+          type: string
+          description: 워크스페이스 설명
           nullable: true
     ProblemDetail-NotFound:
       title: ProblemDetail-NotFound
@@ -2202,19 +2577,6 @@ components:
         status:
           type: number
           description: HTTP 상태 코드
-    CreateWorkspaceRequest:
-      title: CreateWorkspaceRequest
-      required:
-      - name
-      type: object
-      properties:
-        name:
-          type: string
-          description: 워크스페이스 이름
-        description:
-          type: string
-          description: 워크스페이스 설명
-          nullable: true
     SignupRequest:
       title: SignupRequest
       required:
@@ -2321,6 +2683,19 @@ components:
         email:
           type: string
           description: 이메일
+    CreateProblemBoxRequest:
+      title: CreateProblemBoxRequest
+      required:
+      - title
+      type: object
+      properties:
+        description:
+          type: string
+          description: 문제집 설명
+          nullable: true
+        title:
+          type: string
+          description: 문제집 제목
     UpdateWorkspaceMemberNicknameRequest:
       title: UpdateWorkspaceMemberNicknameRequest
       required:
@@ -2330,6 +2705,79 @@ components:
         nickname:
           type: string
           description: 닉네임
+    ApiResponse-ProblemBoxList:
+      title: ApiResponse-ProblemBoxList
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - content
+          - page
+          type: object
+          properties:
+            page:
+              required:
+              - first
+              - last
+              - page
+              - size
+              - totalElements
+              - totalPages
+              type: object
+              properties:
+                last:
+                  type: boolean
+                  description: 마지막 페이지 여부
+                size:
+                  type: number
+                  description: 페이지 크기
+                totalPages:
+                  type: number
+                  description: 전체 페이지 수
+                page:
+                  type: number
+                  description: 페이지 번호
+                first:
+                  type: boolean
+                  description: 첫 페이지 여부
+                totalElements:
+                  type: number
+                  description: 전체 요소 수
+              description: 페이지 정보
+            content:
+              type: array
+              description: 문제집 목록
+              items:
+                required:
+                - createdAt
+                - id
+                - title
+                - updatedAt
+                type: object
+                properties:
+                  createdAt:
+                    type: string
+                    description: 생성일
+                  id:
+                    type: number
+                    description: 문제집 ID
+                  title:
+                    type: string
+                    description: 문제집 제목
+                  updatedAt:
+                    type: string
+                    description: 최근 수정일
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
     ApiResponse-WorkspaceExplore:
       title: ApiResponse-WorkspaceExplore
       required:
@@ -2416,6 +2864,19 @@ components:
           type: string
           description: 메시지
           nullable: true
+    UpdateProblemBoxRequest:
+      title: UpdateProblemBoxRequest
+      required:
+      - title
+      type: object
+      properties:
+        description:
+          type: string
+          description: 문제집 설명
+          nullable: true
+        title:
+          type: string
+          description: 문제집 제목
     ApiResponse-WorkspaceMemberResponse:
       title: ApiResponse-WorkspaceMemberResponse
       required:
@@ -2597,33 +3058,6 @@ components:
           type: string
           description: 메시지
           nullable: true
-    ApiResponse-PresignedUrlResponse:
-      title: ApiResponse-PresignedUrlResponse
-      required:
-      - data
-      - success
-      type: object
-      properties:
-        data:
-          required:
-          - imageUrl
-          - presignedUrl
-          type: object
-          properties:
-            imageUrl:
-              type: string
-              description: 업로드 완료 후 이미지 접근 URL
-            presignedUrl:
-              type: string
-              description: S3 업로드용 Presigned URL
-          description: 응답 데이터
-        success:
-          type: boolean
-          description: 성공 여부
-        message:
-          type: string
-          description: 메시지
-          nullable: true
     ProblemDetail-InvalidParameter:
       title: ProblemDetail-InvalidParameter
       required:
@@ -2657,6 +3091,33 @@ components:
         status:
           type: number
           description: HTTP 상태 코드
+    ApiResponse-PresignedUrlResponse:
+      title: ApiResponse-PresignedUrlResponse
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - imageUrl
+          - presignedUrl
+          type: object
+          properties:
+            imageUrl:
+              type: string
+              description: 업로드 완료 후 이미지 접근 URL
+            presignedUrl:
+              type: string
+              description: S3 업로드용 Presigned URL
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
     ApiResponse-WorkspaceResponse:
       title: ApiResponse-WorkspaceResponse
       required:
@@ -2680,6 +3141,41 @@ components:
             id:
               type: number
               description: 워크스페이스 ID
+          description: 응답 데이터
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-ProblemBoxResponse:
+      title: ApiResponse-ProblemBoxResponse
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - createdAt
+          - id
+          - title
+          type: object
+          properties:
+            createdAt:
+              type: string
+              description: 생성일
+            description:
+              type: string
+              description: 문제집 설명
+              nullable: true
+            id:
+              type: number
+              description: 문제집 ID
+            title:
+              type: string
+              description: 문제집 제목
           description: 응답 데이터
         success:
           type: boolean

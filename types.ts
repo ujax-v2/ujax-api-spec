@@ -304,6 +304,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 문제집 목록 조회
+         * @description 워크스페이스의 문제집 목록을 페이징 조회합니다
+         */
+        get: operations["problem-box-list"];
+        put?: never;
+        /**
+         * 문제집 생성
+         * @description 문제집 생성
+         */
+        post: operations["problem-box-create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/workspaces/{workspaceId}/settings": {
         parameters: {
             query?: never;
@@ -434,6 +458,34 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 문제집 단건 조회
+         * @description 문제집 상세 정보를 조회합니다
+         */
+        get: operations["problem-box-get"];
+        put?: never;
+        post?: never;
+        /**
+         * 문제집 삭제
+         * @description 문제집을 삭제합니다 (OWNER/MANAGER 전용)
+         */
+        delete: operations["problem-box-delete"];
+        options?: never;
+        head?: never;
+        /**
+         * 문제집 수정
+         * @description 문제집 제목/설명을 수정합니다 (OWNER/MANAGER 전용)
+         */
+        patch: operations["problem-box-update"];
         trace?: never;
     };
     "/api/v1/workspaces/{workspaceId}/boards/{boardId}/comments": {
@@ -679,6 +731,15 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
+        /** ApiResponse-BoardList */
+        "ApiResponse-BoardList": {
+            /** @description 응답 데이터 */
+            data: Record<string, never>;
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
         /** UpdateBoardRequest */
         UpdateBoardRequest: {
             /** @description 고정 여부 */
@@ -690,14 +751,12 @@ export interface components {
             /** @description 내용 */
             content?: string | null;
         };
-        /** ApiResponse-BoardList */
-        "ApiResponse-BoardList": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
+        /** CreateWorkspaceRequest */
+        CreateWorkspaceRequest: {
+            /** @description 워크스페이스 이름 */
+            name: string;
+            /** @description 워크스페이스 설명 */
+            description?: string | null;
         };
         /** ProblemDetail-NotFound */
         "ProblemDetail-NotFound": {
@@ -715,13 +774,6 @@ export interface components {
             timestamp: string;
             /** @description HTTP 상태 코드 */
             status: number;
-        };
-        /** CreateWorkspaceRequest */
-        CreateWorkspaceRequest: {
-            /** @description 워크스페이스 이름 */
-            name: string;
-            /** @description 워크스페이스 설명 */
-            description?: string | null;
         };
         /** SignupRequest */
         SignupRequest: {
@@ -777,10 +829,53 @@ export interface components {
             /** @description 이메일 */
             email: string;
         };
+        /** CreateProblemBoxRequest */
+        CreateProblemBoxRequest: {
+            /** @description 문제집 설명 */
+            description?: string | null;
+            /** @description 문제집 제목 */
+            title: string;
+        };
         /** UpdateWorkspaceMemberNicknameRequest */
         UpdateWorkspaceMemberNicknameRequest: {
             /** @description 닉네임 */
             nickname: string;
+        };
+        /** ApiResponse-ProblemBoxList */
+        "ApiResponse-ProblemBoxList": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 페이지 정보 */
+                page: {
+                    /** @description 마지막 페이지 여부 */
+                    last: boolean;
+                    /** @description 페이지 크기 */
+                    size: number;
+                    /** @description 전체 페이지 수 */
+                    totalPages: number;
+                    /** @description 페이지 번호 */
+                    page: number;
+                    /** @description 첫 페이지 여부 */
+                    first: boolean;
+                    /** @description 전체 요소 수 */
+                    totalElements: number;
+                };
+                /** @description 문제집 목록 */
+                content: {
+                    /** @description 생성일 */
+                    createdAt: string;
+                    /** @description 문제집 ID */
+                    id: number;
+                    /** @description 문제집 제목 */
+                    title: string;
+                    /** @description 최근 수정일 */
+                    updatedAt: string;
+                }[];
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
         };
         /** ApiResponse-WorkspaceExplore */
         "ApiResponse-WorkspaceExplore": {
@@ -824,6 +919,13 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
+        };
+        /** UpdateProblemBoxRequest */
+        UpdateProblemBoxRequest: {
+            /** @description 문제집 설명 */
+            description?: string | null;
+            /** @description 문제집 제목 */
+            title: string;
         };
         /** ApiResponse-WorkspaceMemberResponse */
         "ApiResponse-WorkspaceMemberResponse": {
@@ -917,20 +1019,6 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** ApiResponse-PresignedUrlResponse */
-        "ApiResponse-PresignedUrlResponse": {
-            /** @description 응답 데이터 */
-            data: {
-                /** @description 업로드 완료 후 이미지 접근 URL */
-                imageUrl: string;
-                /** @description S3 업로드용 Presigned URL */
-                presignedUrl: string;
-            };
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
-        };
         /** ProblemDetail-InvalidParameter */
         "ProblemDetail-InvalidParameter": {
             /** @description 예외 클래스명 */
@@ -948,6 +1036,20 @@ export interface components {
             /** @description HTTP 상태 코드 */
             status: number;
         };
+        /** ApiResponse-PresignedUrlResponse */
+        "ApiResponse-PresignedUrlResponse": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 업로드 완료 후 이미지 접근 URL */
+                imageUrl: string;
+                /** @description S3 업로드용 Presigned URL */
+                presignedUrl: string;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
         /** ApiResponse-WorkspaceResponse */
         "ApiResponse-WorkspaceResponse": {
             /** @description 응답 데이터 */
@@ -958,6 +1060,24 @@ export interface components {
                 description?: string | null;
                 /** @description 워크스페이스 ID */
                 id: number;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-ProblemBoxResponse */
+        "ApiResponse-ProblemBoxResponse": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 생성일 */
+                createdAt: string;
+                /** @description 문제집 설명 */
+                description?: string | null;
+                /** @description 문제집 ID */
+                id: number;
+                /** @description 문제집 제목 */
+                title: string;
             };
             /** @description 성공 여부 */
             success: boolean;
@@ -1604,6 +1724,88 @@ export interface operations {
             };
         };
     };
+    "problem-box-list": {
+        parameters: {
+            query?: {
+                /** @description 페이지 번호 */
+                page?: string;
+                /** @description 페이지 크기 */
+                size?: string;
+            };
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-ProblemBoxList"];
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
+                };
+            };
+        };
+    };
+    "problem-box-create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json;charset=UTF-8": components["schemas"]["CreateProblemBoxRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-ProblemBoxResponse"];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Validation"];
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
+                };
+            };
+        };
+    };
     "workspace-settings": {
         parameters: {
             query?: never;
@@ -1869,6 +2071,112 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
+                };
+            };
+        };
+    };
+    "problem-box-get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+                /** @description 문제집 ID */
+                problemBoxId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-ProblemBoxResponse"];
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-NotFound"];
+                };
+            };
+        };
+    };
+    "problem-box-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+                /** @description 문제집 ID */
+                problemBoxId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-Void"];
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
+                };
+            };
+        };
+    };
+    "problem-box-update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+                /** @description 문제집 ID */
+                problemBoxId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json;charset=UTF-8": components["schemas"]["UpdateProblemBoxRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-ProblemBoxResponse"];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Validation"];
                 };
             };
         };
