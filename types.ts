@@ -779,6 +779,15 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
+        /** ApiResponse-BoardList */
+        "ApiResponse-BoardList": {
+            /** @description 응답 데이터 */
+            data: Record<string, never>;
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
         /** UpdateBoardRequest */
         UpdateBoardRequest: {
             /** @description 고정 여부 */
@@ -789,15 +798,6 @@ export interface components {
             type?: string | null;
             /** @description 내용 */
             content?: string | null;
-        };
-        /** ApiResponse-BoardList */
-        "ApiResponse-BoardList": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
         };
         /** UpdateWorkspaceProblemRequest */
         UpdateWorkspaceProblemRequest: {
@@ -884,17 +884,17 @@ export interface components {
             /** @description 이메일 */
             email: string;
         };
+        /** UpdateWorkspaceMemberNicknameRequest */
+        UpdateWorkspaceMemberNicknameRequest: {
+            /** @description 닉네임 */
+            nickname: string;
+        };
         /** CreateProblemBoxRequest */
         CreateProblemBoxRequest: {
             /** @description 문제집 설명 */
             description?: string | null;
             /** @description 문제집 제목 */
             title: string;
-        };
-        /** UpdateWorkspaceMemberNicknameRequest */
-        UpdateWorkspaceMemberNicknameRequest: {
-            /** @description 닉네임 */
-            nickname: string;
         };
         /** ApiResponse-ProblemBoxList */
         "ApiResponse-ProblemBoxList": {
@@ -931,15 +931,6 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
-        };
-        /** CreateWorkspaceProblemRequest */
-        CreateWorkspaceProblemRequest: {
-            /** @description 백준 문제 번호 */
-            problemNumber: number;
-            /** @description 마감일 */
-            deadline?: (never | string) | null;
-            /** @description 예정일 */
-            scheduledAt?: (never | string) | null;
         };
         /** ApiResponse-WorkspaceExplore */
         "ApiResponse-WorkspaceExplore": {
@@ -1165,6 +1156,15 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
+        };
+        /** CreateWorkspaceProblemRequest */
+        CreateWorkspaceProblemRequest: {
+            /** @description 문제 ID */
+            problemId: number;
+            /** @description 마감일 */
+            deadline?: (never | string) | null;
+            /** @description 예정일 */
+            scheduledAt?: (never | string) | null;
         };
         /** ProblemDetail-InvalidParameter */
         "ProblemDetail-InvalidParameter": {
