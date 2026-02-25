@@ -11,11 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * 내 워크스페이스 목록 조회
-         * @description 유저가 속한 워크스페이스 목록을 조회합니다
-         */
-        get: operations["workspace-my-list"];
+        get?: never;
         put?: never;
         /**
          * 워크스페이스 생성
@@ -196,7 +192,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/workspaces/search": {
+    "/api/v1/workspaces/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -204,10 +200,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 워크스페이스 검색
-         * @description 워크스페이스 검색
+         * 내 워크스페이스 목록 조회
+         * @description 유저가 속한 워크스페이스 목록을 조회합니다 (/me)
          */
-        get: operations["workspace-search"];
+        get: operations["workspace-my-list-me"];
         put?: never;
         post?: never;
         delete?: never;
@@ -661,15 +657,6 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** ApiResponse-BoardList */
-        "ApiResponse-BoardList": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
-        };
         /** ApiResponse-UserResponse */
         "ApiResponse-UserResponse": {
             /** @description 응답 데이터 */
@@ -703,31 +690,14 @@ export interface components {
             /** @description 내용 */
             content?: string | null;
         };
-        /** ApiResponse-WorkspaceList */
-        "ApiResponse-WorkspaceList": {
+        /** ApiResponse-BoardList */
+        "ApiResponse-BoardList": {
             /** @description 응답 데이터 */
-            data: {
-                /** @description 워크스페이스 목록 */
-                items: {
-                    /** @description 워크스페이스 이름 */
-                    name: string;
-                    /** @description 워크스페이스 설명 */
-                    description?: string | null;
-                    /** @description 워크스페이스 ID */
-                    id: number;
-                }[];
-            };
+            data: Record<string, never>;
             /** @description 성공 여부 */
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
-        };
-        /** CreateWorkspaceRequest */
-        CreateWorkspaceRequest: {
-            /** @description 워크스페이스 이름 */
-            name: string;
-            /** @description 워크스페이스 설명 */
-            description?: string | null;
         };
         /** ProblemDetail-NotFound */
         "ProblemDetail-NotFound": {
@@ -745,6 +715,13 @@ export interface components {
             timestamp: string;
             /** @description HTTP 상태 코드 */
             status: number;
+        };
+        /** CreateWorkspaceRequest */
+        CreateWorkspaceRequest: {
+            /** @description 워크스페이스 이름 */
+            name: string;
+            /** @description 워크스페이스 설명 */
+            description?: string | null;
         };
         /** SignupRequest */
         SignupRequest: {
@@ -804,23 +781,6 @@ export interface components {
         UpdateWorkspaceMemberNicknameRequest: {
             /** @description 닉네임 */
             nickname: string;
-        };
-        /** ProblemDetail-MissingParameter */
-        "ProblemDetail-MissingParameter": {
-            /** @description 예외 클래스명 */
-            exception: string;
-            /** @description 오류 인스턴스 */
-            instance?: string | null;
-            /** @description 오류 상세 메시지 */
-            detail: string;
-            /** @description 에러 코드 */
-            title: string;
-            /** @description 오류 문서 URI */
-            type: string;
-            /** @description 발생 시각 */
-            timestamp: string;
-            /** @description HTTP 상태 코드 */
-            status: number;
         };
         /** ApiResponse-WorkspaceExplore */
         "ApiResponse-WorkspaceExplore": {
@@ -914,17 +874,8 @@ export interface components {
             /** @description 워크스페이스 설명 */
             description?: string | null;
         };
-        /** ApiResponse-CommentList */
-        "ApiResponse-CommentList": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
-        };
-        /** ApiResponse-WorkspaceSearch */
-        "ApiResponse-WorkspaceSearch": {
+        /** ApiResponse-WorkspaceMyPage */
+        "ApiResponse-WorkspaceMyPage": {
             /** @description 응답 데이터 */
             data: {
                 /** @description 페이지 정보 */
@@ -952,6 +903,15 @@ export interface components {
                     id: number;
                 }[];
             };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-CommentList */
+        "ApiResponse-CommentList": {
+            /** @description 응답 데이터 */
+            data: Record<string, never>;
             /** @description 성공 여부 */
             success: boolean;
             /** @description 메시지 */
@@ -1125,26 +1085,6 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "workspace-my-list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiResponse-WorkspaceList"];
-                };
-            };
-        };
-    };
     "workspace-create": {
         parameters: {
             query?: never;
@@ -1388,6 +1328,8 @@ export interface operations {
     "workspace-explore": {
         parameters: {
             query?: {
+                /** @description 검색어 */
+                name?: string;
                 /** @description 페이지 번호 */
                 page?: string;
                 /** @description 페이지 크기 */
@@ -1419,11 +1361,9 @@ export interface operations {
             };
         };
     };
-    "workspace-search": {
+    "workspace-my-list-me": {
         parameters: {
-            query: {
-                /** @description 검색어 */
-                name: string;
+            query?: {
                 /** @description 페이지 번호 */
                 page?: string;
                 /** @description 페이지 크기 */
@@ -1441,16 +1381,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiResponse-WorkspaceSearch"];
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["ProblemDetail-MissingParameter"];
+                    "application/json": components["schemas"]["ApiResponse-WorkspaceMyPage"];
                 };
             };
         };
