@@ -600,6 +600,30 @@ export interface paths {
         patch: operations["workspace-member-role-update"];
         trace?: never;
     };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 문제 목록 조회
+         * @description 문제 목록 조회
+         */
+        get: operations["workspace-problem-list"];
+        put?: never;
+        /**
+         * 문제 등록
+         * @description 문제 등록
+         */
+        post: operations["workspace-problem-create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/workspaces/{workspaceId}/boards/{boardId}/comments/{commentId}": {
         parameters: {
             query?: never;
@@ -618,6 +642,30 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * 문제 삭제
+         * @description 문제 삭제
+         */
+        delete: operations["workspace-problem-delete"];
+        options?: never;
+        head?: never;
+        /**
+         * 문제 수정
+         * @description 문제집 문제의 마감일/예정일을 수정합니다 (OWNER/MANAGER 전용)
+         */
+        patch: operations["workspace-problem-update"];
         trace?: never;
     };
 }
@@ -731,15 +779,6 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** ApiResponse-BoardList */
-        "ApiResponse-BoardList": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
-        };
         /** UpdateBoardRequest */
         UpdateBoardRequest: {
             /** @description 고정 여부 */
@@ -751,12 +790,21 @@ export interface components {
             /** @description 내용 */
             content?: string | null;
         };
-        /** CreateWorkspaceRequest */
-        CreateWorkspaceRequest: {
-            /** @description 워크스페이스 이름 */
-            name: string;
-            /** @description 워크스페이스 설명 */
-            description?: string | null;
+        /** ApiResponse-BoardList */
+        "ApiResponse-BoardList": {
+            /** @description 응답 데이터 */
+            data: Record<string, never>;
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** UpdateWorkspaceProblemRequest */
+        UpdateWorkspaceProblemRequest: {
+            /** @description 마감일 */
+            deadline?: (never | string) | null;
+            /** @description 예정일 */
+            scheduledAt?: (never | string) | null;
         };
         /** ProblemDetail-NotFound */
         "ProblemDetail-NotFound": {
@@ -774,6 +822,13 @@ export interface components {
             timestamp: string;
             /** @description HTTP 상태 코드 */
             status: number;
+        };
+        /** CreateWorkspaceRequest */
+        CreateWorkspaceRequest: {
+            /** @description 워크스페이스 이름 */
+            name: string;
+            /** @description 워크스페이스 설명 */
+            description?: string | null;
         };
         /** SignupRequest */
         SignupRequest: {
@@ -877,6 +932,15 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
+        /** CreateWorkspaceProblemRequest */
+        CreateWorkspaceProblemRequest: {
+            /** @description 백준 문제 번호 */
+            problemNumber: number;
+            /** @description 마감일 */
+            deadline?: (never | string) | null;
+            /** @description 예정일 */
+            scheduledAt?: (never | string) | null;
+        };
         /** ApiResponse-WorkspaceExplore */
         "ApiResponse-WorkspaceExplore": {
             /** @description 응답 데이터 */
@@ -948,6 +1012,23 @@ export interface components {
             /** @description 초대할 이메일 */
             email: string;
         };
+        /** ProblemDetail-Conflict */
+        "ProblemDetail-Conflict": {
+            /** @description 예외 클래스명 */
+            exception: string;
+            /** @description 오류 인스턴스 */
+            instance?: string | null;
+            /** @description 오류 상세 메시지 */
+            detail: string;
+            /** @description 에러 코드 */
+            title: string;
+            /** @description 오류 문서 URI */
+            type: string;
+            /** @description 발생 시각 */
+            timestamp: string;
+            /** @description HTTP 상태 코드 */
+            status: number;
+        };
         /** ApiResponse-WorkspaceMemberList */
         "ApiResponse-WorkspaceMemberList": {
             /** @description 응답 데이터 */
@@ -960,6 +1041,48 @@ export interface components {
                     nickname: string;
                     /** @description 워크스페이스 멤버 ID */
                     workspaceMemberId: number;
+                }[];
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-WorkspaceProblemList */
+        "ApiResponse-WorkspaceProblemList": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 페이지 정보 */
+                page: {
+                    /** @description 마지막 페이지 여부 */
+                    last: boolean;
+                    /** @description 페이지 크기 */
+                    size: number;
+                    /** @description 전체 페이지 수 */
+                    totalPages: number;
+                    /** @description 페이지 번호 */
+                    page: number;
+                    /** @description 첫 페이지 여부 */
+                    first: boolean;
+                    /** @description 전체 요소 수 */
+                    totalElements: number;
+                };
+                /** @description 문제 목록 */
+                content: {
+                    /** @description 등록일 */
+                    createdAt: string;
+                    /** @description 문제 난이도 */
+                    tier?: string | null;
+                    /** @description 백준 문제 번호 */
+                    problemNumber: number;
+                    /** @description 문제집 문제 ID */
+                    id: number;
+                    /** @description 마감일 */
+                    deadline?: string | null;
+                    /** @description 문제 제목 */
+                    title: string;
+                    /** @description 예정일 */
+                    scheduledAt?: string | null;
                 }[];
             };
             /** @description 성공 여부 */
@@ -1014,6 +1137,30 @@ export interface components {
         "ApiResponse-CommentList": {
             /** @description 응답 데이터 */
             data: Record<string, never>;
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-WorkspaceProblemResponse */
+        "ApiResponse-WorkspaceProblemResponse": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 등록일 */
+                createdAt: string;
+                /** @description 문제 난이도 */
+                tier?: string | null;
+                /** @description 백준 문제 번호 */
+                problemNumber: number;
+                /** @description 문제집 문제 ID */
+                id: number;
+                /** @description 마감일 */
+                deadline?: string | null;
+                /** @description 문제 제목 */
+                title: string;
+                /** @description 예정일 */
+                scheduledAt?: string | null;
+            };
             /** @description 성공 여부 */
             success: boolean;
             /** @description 메시지 */
@@ -2418,6 +2565,101 @@ export interface operations {
             };
         };
     };
+    "workspace-problem-list": {
+        parameters: {
+            query?: {
+                /** @description 페이지 번호 */
+                page?: string;
+                /** @description 페이지 크기 */
+                size?: string;
+            };
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+                /** @description 문제집 ID */
+                problemBoxId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-WorkspaceProblemList"];
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
+                };
+            };
+        };
+    };
+    "workspace-problem-create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+                /** @description 문제집 ID */
+                problemBoxId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json;charset=UTF-8": components["schemas"]["CreateWorkspaceProblemRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-WorkspaceProblemResponse"];
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-NotFound"];
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Conflict"];
+                };
+            };
+        };
+    };
     "board-comment-delete": {
         parameters: {
             query?: never;
@@ -2441,6 +2683,82 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiResponse-Void"];
+                };
+            };
+        };
+    };
+    "workspace-problem-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+                /** @description 문제집 ID */
+                problemBoxId: string;
+                /** @description 문제집 문제 ID */
+                workspaceProblemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-Void"];
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
+                };
+            };
+        };
+    };
+    "workspace-problem-update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+                /** @description 문제집 ID */
+                problemBoxId: string;
+                /** @description 문제집 문제 ID */
+                workspaceProblemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json;charset=UTF-8": components["schemas"]["UpdateWorkspaceProblemRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-WorkspaceProblemResponse"];
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
                 };
             };
         };
