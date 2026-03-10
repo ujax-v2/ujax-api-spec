@@ -3278,6 +3278,396 @@ paths:
                       },
                       "message" : null
                     }
+  /api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members:
+    get:
+      tags:
+      - Solution
+      summary: 풀이 멤버 요약 목록 조회
+      description: 문제를 푼 멤버별 최신 풀이 요약을 조회합니다
+      operationId: solution-member-list
+      parameters:
+      - name: workspaceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceProblemId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-SolutionMemberSummaryList"
+              examples:
+                solution-member-list:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : [ {
+                        "workspaceMemberId" : 11,
+                        "memberName" : "pythonista",
+                        "programmingLanguage" : "PYTHON",
+                        "latestStatus" : "ACCEPTED",
+                        "submissionCount" : 2,
+                        "likes" : 1,
+                        "updatedAt" : "2026-03-10T16:41:31.023351"
+                      } ],
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members/{workspaceMemberId}/submissions:
+    get:
+      tags:
+      - Solution
+      summary: 풀이 버전 목록 조회
+      description: 특정 멤버의 제출 버전 목록을 최신순으로 조회합니다
+      operationId: solution-version-list
+      parameters:
+      - name: workspaceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceProblemId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceMemberId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-SolutionVersionList"
+              examples:
+                solution-version-list:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "content" : [ {
+                          "submissionId" : 12005,
+                          "code" : "print(sum(map(int, input().split())))",
+                          "status" : "ACCEPTED",
+                          "time" : "28 ms",
+                          "memory" : "31120 KB",
+                          "codeLength" : "34 B",
+                          "createdAt" : "2026-03-10T16:41:31.946853",
+                          "likes" : 1,
+                          "isLiked" : true,
+                          "commentCount" : 0
+                        } ],
+                        "page" : {
+                          "page" : 0,
+                          "size" : 1,
+                          "totalElements" : 2,
+                          "totalPages" : 2,
+                          "first" : true,
+                          "last" : false
+                        }
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members/{workspaceMemberId}/submissions/{submissionId}/comments:
+    get:
+      tags:
+      - Solution
+      summary: 풀이 댓글 목록 조회
+      description: 특정 제출 버전의 댓글 목록을 조회합니다
+      operationId: solution-comment-list
+      parameters:
+      - name: workspaceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceProblemId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceMemberId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-SolutionCommentList"
+              examples:
+                solution-comment-list:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : [ {
+                        "id" : 1,
+                        "authorName" : "pythonista",
+                        "content" : "좋은 풀이네요",
+                        "createdAt" : "2026-03-10T16:41:32.036197"
+                      } ],
+                      "message" : null
+                    }
+    post:
+      tags:
+      - Solution
+      summary: 풀이 댓글 생성
+      description: 특정 제출 버전에 댓글을 생성합니다
+      operationId: solution-comment-create
+      parameters:
+      - name: workspaceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceProblemId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceMemberId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/SolutionCommentCreateRequest"
+            examples:
+              solution-comment-create:
+                value: |-
+                  {
+                    "content" : "댓글"
+                  }
+      responses:
+        "201":
+          description: "201"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-SolutionCommentResponse"
+              examples:
+                solution-comment-create:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : 1,
+                        "authorName" : "pythonista",
+                        "content" : "댓글",
+                        "createdAt" : "2026-03-10T16:41:31.674182"
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members/{workspaceMemberId}/submissions/{submissionId}/likes:
+    put:
+      tags:
+      - Solution
+      summary: 풀이 좋아요 등록
+      description: 특정 제출 버전에 좋아요를 등록합니다
+      operationId: solution-like
+      parameters:
+      - name: workspaceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceProblemId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceMemberId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-SolutionLikeStatus"
+              examples:
+                solution-like:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "likes" : 1,
+                        "isLiked" : true
+                      },
+                      "message" : null
+                    }
+    delete:
+      tags:
+      - Solution
+      summary: 풀이 좋아요 취소
+      description: 특정 제출 버전의 좋아요를 취소합니다
+      operationId: solution-unlike
+      parameters:
+      - name: workspaceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceProblemId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceMemberId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-SolutionLikeStatus"
+              examples:
+                solution-unlike:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "likes" : 0,
+                        "isLiked" : false
+                      },
+                      "message" : null
+                    }
+  /api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members/{workspaceMemberId}/submissions/{submissionId}/comments/{commentId}:
+    delete:
+      tags:
+      - Solution
+      summary: 풀이 댓글 삭제
+      description: 특정 제출 버전의 댓글을 삭제합니다
+      operationId: solution-comment-delete
+      parameters:
+      - name: workspaceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: problemBoxId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceProblemId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: workspaceMemberId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse-Void"
+              examples:
+                solution-comment-delete:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "message" : null
+                    }
 components:
   securitySchemes:
     bearerAuth:
@@ -5125,3 +5515,257 @@ components:
           type: string
           description: 수정할 프로필 이미지 URL
           nullable: true
+    ApiResponse-SolutionMemberSummaryList:
+      title: ApiResponse-SolutionMemberSummaryList
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          type: array
+          description: 응답 데이터
+          items:
+            required:
+            - latestStatus
+            - likes
+            - memberName
+            - programmingLanguage
+            - submissionCount
+            - updatedAt
+            - workspaceMemberId
+            type: object
+            properties:
+              workspaceMemberId:
+                type: number
+                description: 워크스페이스 멤버 ID
+              memberName:
+                type: string
+                description: 멤버 이름
+              programmingLanguage:
+                type: string
+                description: 최신 제출 언어
+              latestStatus:
+                type: string
+                description: 최신 제출 상태
+              submissionCount:
+                type: number
+                description: 총 제출 수
+              likes:
+                type: number
+                description: 최신 제출 좋아요 수
+              updatedAt:
+                type: string
+                description: 최신 제출 시각
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-SolutionVersionList:
+      title: ApiResponse-SolutionVersionList
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - content
+          - page
+          type: object
+          description: 응답 데이터
+          properties:
+            content:
+              type: array
+              description: 버전 목록
+              items:
+                required:
+                - commentCount
+                - createdAt
+                - isLiked
+                - likes
+                - status
+                - submissionId
+                type: object
+                properties:
+                  submissionId:
+                    type: number
+                    description: 백준 제출 번호
+                  code:
+                    type: string
+                    description: 소스 코드
+                    nullable: true
+                  status:
+                    type: string
+                    description: 채점 상태
+                  time:
+                    type: string
+                    description: 실행 시간
+                    nullable: true
+                  memory:
+                    type: string
+                    description: 메모리
+                    nullable: true
+                  codeLength:
+                    type: string
+                    description: 코드 길이
+                    nullable: true
+                  createdAt:
+                    type: string
+                    description: 생성 시각
+                  likes:
+                    type: number
+                    description: 좋아요 수
+                  isLiked:
+                    type: boolean
+                    description: 내 좋아요 여부
+                  commentCount:
+                    type: number
+                    description: 댓글 수
+            page:
+              required:
+              - first
+              - last
+              - page
+              - size
+              - totalElements
+              - totalPages
+              type: object
+              description: 페이지 정보
+              properties:
+                page:
+                  type: number
+                  description: 페이지 번호
+                size:
+                  type: number
+                  description: 페이지 크기
+                totalElements:
+                  type: number
+                  description: 전체 요소 수
+                totalPages:
+                  type: number
+                  description: 전체 페이지 수
+                first:
+                  type: boolean
+                  description: 첫 페이지 여부
+                last:
+                  type: boolean
+                  description: 마지막 페이지 여부
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-SolutionCommentList:
+      title: ApiResponse-SolutionCommentList
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          type: array
+          description: 응답 데이터
+          items:
+            required:
+            - authorName
+            - content
+            - createdAt
+            - id
+            type: object
+            properties:
+              id:
+                type: number
+                description: 댓글 ID
+              authorName:
+                type: string
+                description: 작성자 이름
+              content:
+                type: string
+                description: 댓글 내용
+              createdAt:
+                type: string
+                description: 생성 시각
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-SolutionCommentResponse:
+      title: ApiResponse-SolutionCommentResponse
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - authorName
+          - content
+          - createdAt
+          - id
+          type: object
+          description: 응답 데이터
+          properties:
+            id:
+              type: number
+              description: 댓글 ID
+            authorName:
+              type: string
+              description: 작성자 이름
+            content:
+              type: string
+              description: 댓글 내용
+            createdAt:
+              type: string
+              description: 생성 시각
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    ApiResponse-SolutionLikeStatus:
+      title: ApiResponse-SolutionLikeStatus
+      required:
+      - data
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - isLiked
+          - likes
+          type: object
+          description: 응답 데이터
+          properties:
+            likes:
+              type: number
+              description: 좋아요 수
+            isLiked:
+              type: boolean
+              description: 내 좋아요 여부
+        success:
+          type: boolean
+          description: 성공 여부
+        message:
+          type: string
+          description: 메시지
+          nullable: true
+    SolutionCommentCreateRequest:
+      title: SolutionCommentCreateRequest
+      required:
+      - content
+      type: object
+      properties:
+        content:
+          type: string
+          description: 댓글 내용

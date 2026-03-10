@@ -852,6 +852,114 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 풀이 멤버 요약 목록 조회
+         * @description 문제를 푼 멤버별 최신 풀이 요약을 조회합니다
+         */
+        get: operations["solution-member-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members/{workspaceMemberId}/submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 풀이 버전 목록 조회
+         * @description 특정 멤버의 제출 버전 목록을 최신순으로 조회합니다
+         */
+        get: operations["solution-version-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members/{workspaceMemberId}/submissions/{submissionId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 풀이 댓글 목록 조회
+         * @description 특정 제출 버전의 댓글 목록을 조회합니다
+         */
+        get: operations["solution-comment-list"];
+        put?: never;
+        /**
+         * 풀이 댓글 생성
+         * @description 특정 제출 버전에 댓글을 생성합니다
+         */
+        post: operations["solution-comment-create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members/{workspaceMemberId}/submissions/{submissionId}/likes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 풀이 좋아요 등록
+         * @description 특정 제출 버전에 좋아요를 등록합니다
+         */
+        put: operations["solution-like"];
+        post?: never;
+        /**
+         * 풀이 좋아요 취소
+         * @description 특정 제출 버전의 좋아요를 취소합니다
+         */
+        delete: operations["solution-unlike"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/problem-boxes/{problemBoxId}/problems/{workspaceProblemId}/solution-members/{workspaceMemberId}/submissions/{submissionId}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * 풀이 댓글 삭제
+         * @description 특정 제출 버전의 댓글을 삭제합니다
+         */
+        delete: operations["solution-comment-delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1782,6 +1890,133 @@ export interface components {
             baekjoonId?: string | null;
             /** @description 수정할 프로필 이미지 URL */
             profileImageUrl?: string | null;
+        };
+        /** ApiResponse-SolutionMemberSummaryList */
+        "ApiResponse-SolutionMemberSummaryList": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 워크스페이스 멤버 ID */
+                workspaceMemberId: number;
+                /** @description 멤버 이름 */
+                memberName: string;
+                /** @description 최신 제출 언어 */
+                programmingLanguage: string;
+                /** @description 최신 제출 상태 */
+                latestStatus: string;
+                /** @description 총 제출 수 */
+                submissionCount: number;
+                /** @description 최신 제출 좋아요 수 */
+                likes: number;
+                /** @description 최신 제출 시각 */
+                updatedAt: string;
+            }[];
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-SolutionVersionList */
+        "ApiResponse-SolutionVersionList": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 버전 목록 */
+                content: {
+                    /** @description 백준 제출 번호 */
+                    submissionId: number;
+                    /** @description 소스 코드 */
+                    code?: string | null;
+                    /** @description 채점 상태 */
+                    status: string;
+                    /** @description 실행 시간 */
+                    time?: string | null;
+                    /** @description 메모리 */
+                    memory?: string | null;
+                    /** @description 코드 길이 */
+                    codeLength?: string | null;
+                    /** @description 생성 시각 */
+                    createdAt: string;
+                    /** @description 좋아요 수 */
+                    likes: number;
+                    /** @description 내 좋아요 여부 */
+                    isLiked: boolean;
+                    /** @description 댓글 수 */
+                    commentCount: number;
+                }[];
+                /** @description 페이지 정보 */
+                page: {
+                    /** @description 페이지 번호 */
+                    page: number;
+                    /** @description 페이지 크기 */
+                    size: number;
+                    /** @description 전체 요소 수 */
+                    totalElements: number;
+                    /** @description 전체 페이지 수 */
+                    totalPages: number;
+                    /** @description 첫 페이지 여부 */
+                    first: boolean;
+                    /** @description 마지막 페이지 여부 */
+                    last: boolean;
+                };
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-SolutionCommentList */
+        "ApiResponse-SolutionCommentList": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 댓글 ID */
+                id: number;
+                /** @description 작성자 이름 */
+                authorName: string;
+                /** @description 댓글 내용 */
+                content: string;
+                /** @description 생성 시각 */
+                createdAt: string;
+            }[];
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-SolutionCommentResponse */
+        "ApiResponse-SolutionCommentResponse": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 댓글 ID */
+                id: number;
+                /** @description 작성자 이름 */
+                authorName: string;
+                /** @description 댓글 내용 */
+                content: string;
+                /** @description 생성 시각 */
+                createdAt: string;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-SolutionLikeStatus */
+        "ApiResponse-SolutionLikeStatus": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 좋아요 수 */
+                likes: number;
+                /** @description 내 좋아요 여부 */
+                isLiked: boolean;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** SolutionCommentCreateRequest */
+        SolutionCommentCreateRequest: {
+            /** @description 댓글 내용 */
+            content: string;
         };
     };
     responses: never;
@@ -3530,6 +3765,193 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetail-Forbidden"];
+                };
+            };
+        };
+    };
+    "solution-member-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: string;
+                problemBoxId: string;
+                workspaceProblemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-SolutionMemberSummaryList"];
+                };
+            };
+        };
+    };
+    "solution-version-list": {
+        parameters: {
+            query?: {
+                page?: string;
+                size?: string;
+            };
+            header?: never;
+            path: {
+                workspaceId: string;
+                problemBoxId: string;
+                workspaceProblemId: string;
+                workspaceMemberId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-SolutionVersionList"];
+                };
+            };
+        };
+    };
+    "solution-comment-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: string;
+                problemBoxId: string;
+                workspaceProblemId: string;
+                workspaceMemberId: string;
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-SolutionCommentList"];
+                };
+            };
+        };
+    };
+    "solution-comment-create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: string;
+                problemBoxId: string;
+                workspaceProblemId: string;
+                workspaceMemberId: string;
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json;charset=UTF-8": components["schemas"]["SolutionCommentCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description 201 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-SolutionCommentResponse"];
+                };
+            };
+        };
+    };
+    "solution-like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: string;
+                problemBoxId: string;
+                workspaceProblemId: string;
+                workspaceMemberId: string;
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-SolutionLikeStatus"];
+                };
+            };
+        };
+    };
+    "solution-unlike": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: string;
+                problemBoxId: string;
+                workspaceProblemId: string;
+                workspaceMemberId: string;
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-SolutionLikeStatus"];
+                };
+            };
+        };
+    };
+    "solution-comment-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspaceId: string;
+                problemBoxId: string;
+                workspaceProblemId: string;
+                workspaceMemberId: string;
+                submissionId: string;
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-Void"];
                 };
             };
         };
