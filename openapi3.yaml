@@ -5625,6 +5625,10 @@ components:
                   commentCount:
                     type: number
                     description: 댓글 수
+                  programmingLanguage:
+                    type: string
+                    description: 프로그래밍 언어
+                    nullable: true
             page:
               required:
               - first

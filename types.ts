@@ -1941,6 +1941,8 @@ export interface components {
                     isLiked: boolean;
                     /** @description 댓글 수 */
                     commentCount: number;
+                    /** @description 프로그래밍 언어 */
+                    programmingLanguage?: string | null;
                 }[];
                 /** @description 페이지 정보 */
                 page: {
