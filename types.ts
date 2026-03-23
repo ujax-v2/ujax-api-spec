@@ -616,6 +616,26 @@ export interface paths {
         patch: operations["problem-box-update"];
         trace?: never;
     };
+    "/api/v1/workspaces/{workspaceId}/boards/image/presigned-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 게시글 이미지 업로드 Presigned URL 생성
+         * @description S3에 게시글 이미지를 업로드하기 위한 Presigned URL을 생성합니다. 게시글 작성/수정 에디터에서 붙여넣은 이미지 업로드에 사용합니다. JPEG, PNG, WEBP만 허용되며 최대 5MB입니다.
+         */
+        post: operations["board-create-image-presigned-url"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/workspaces/{workspaceId}/boards/{boardId}/comments": {
         parameters: {
             query?: never;
@@ -1149,6 +1169,15 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
+        /** ApiResponse-BoardList */
+        "ApiResponse-BoardList": {
+            /** @description 응답 데이터 */
+            data: Record<string, never>;
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
         /** ApiResponse-WorkspaceSettings */
         "ApiResponse-WorkspaceSettings": {
             /** @description 응답 데이터 */
@@ -1169,14 +1198,12 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** ApiResponse-BoardList */
-        "ApiResponse-BoardList": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
+        /** UpdateWorkspaceProblemRequest */
+        UpdateWorkspaceProblemRequest: {
+            /** @description 마감일 */
+            deadline?: (never | string) | null;
+            /** @description 예정일 */
+            scheduledAt?: (never | string) | null;
         };
         /** ApiResponse-AuthTokenResponse */
         "ApiResponse-AuthTokenResponse": {
@@ -1191,20 +1218,6 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
-        };
-        /** UpdateWorkspaceProblemRequest */
-        UpdateWorkspaceProblemRequest: {
-            /** @description 마감일 */
-            deadline?: (never | string) | null;
-            /** @description 예정일 */
-            scheduledAt?: (never | string) | null;
-        };
-        /** CreateWorkspaceRequest */
-        CreateWorkspaceRequest: {
-            /** @description 워크스페이스 이름 */
-            name: string;
-            /** @description 워크스페이스 설명 */
-            description?: string | null;
         };
         /** ProblemDetail-NotFound */
         "ProblemDetail-NotFound": {
@@ -1222,6 +1235,13 @@ export interface components {
             timestamp: string;
             /** @description HTTP 상태 코드 */
             status: number;
+        };
+        /** CreateWorkspaceRequest */
+        CreateWorkspaceRequest: {
+            /** @description 워크스페이스 이름 */
+            name: string;
+            /** @description 워크스페이스 설명 */
+            description?: string | null;
         };
         /** SignupRequest */
         SignupRequest: {
@@ -1297,6 +1317,23 @@ export interface components {
             /** @description Hook URL */
             hookUrl?: string | null;
         };
+        /** ApiResponse-SubmissionResponse */
+        "ApiResponse-SubmissionResponse": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 제출 통합 토큰 */
+                submissionToken: string;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** UpdateWorkspaceMemberNicknameRequest */
+        UpdateWorkspaceMemberNicknameRequest: {
+            /** @description 닉네임 */
+            nickname: string;
+        };
         /** CreateProblemBoxRequest */
         CreateProblemBoxRequest: {
             /** @description 문제집 설명 */
@@ -1304,17 +1341,44 @@ export interface components {
             /** @description 문제집 제목 */
             title: string;
         };
-        /** UpdateWorkspaceMemberNicknameRequest */
-        UpdateWorkspaceMemberNicknameRequest: {
-            /** @description 닉네임 */
-            nickname: string;
-        };
-        /** ApiResponse-SubmissionResponse */
-        "ApiResponse-SubmissionResponse": {
+        /** ApiResponse-PresignedUrlResponse */
+        "ApiResponse-PresignedUrlResponse": {
             /** @description 응답 데이터 */
             data: {
-                /** @description 제출 통합 토큰 */
-                submissionToken: string;
+                /** @description 업로드 완료 후 이미지 접근 URL */
+                imageUrl: string;
+                /** @description S3 업로드용 Presigned URL */
+                presignedUrl: string;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-SolutionResponse */
+        "ApiResponse-SolutionResponse": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 생성 시각 */
+                createdAt: string;
+                /** @description 코드 길이 */
+                codeLength?: string | null;
+                /** @description 메모리 */
+                memory?: string | null;
+                /** @description 백준 제출 번호 */
+                submissionId: number;
+                /** @description 프로그래밍 언어 */
+                programmingLanguage: string;
+                /** @description 백준 문제 번호 */
+                problemNumber: number;
+                /** @description 멤버 이름 */
+                memberName: string;
+                /** @description 실행 시간 */
+                time?: string | null;
+                /** @description 풀이 ID */
+                id: number;
+                /** @description 채점 상태 */
+                status: string;
             };
             /** @description 성공 여부 */
             success: boolean;
@@ -1351,36 +1415,6 @@ export interface components {
                     /** @description 최근 수정일 */
                     updatedAt: string;
                 }[];
-            };
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
-        };
-        /** ApiResponse-SolutionResponse */
-        "ApiResponse-SolutionResponse": {
-            /** @description 응답 데이터 */
-            data: {
-                /** @description 생성 시각 */
-                createdAt: string;
-                /** @description 코드 길이 */
-                codeLength?: string | null;
-                /** @description 메모리 */
-                memory?: string | null;
-                /** @description 백준 제출 번호 */
-                submissionId: number;
-                /** @description 프로그래밍 언어 */
-                programmingLanguage: string;
-                /** @description 백준 문제 번호 */
-                problemNumber: number;
-                /** @description 멤버 이름 */
-                memberName: string;
-                /** @description 실행 시간 */
-                time?: string | null;
-                /** @description 풀이 ID */
-                id: number;
-                /** @description 채점 상태 */
-                status: string;
             };
             /** @description 성공 여부 */
             success: boolean;
@@ -1487,15 +1521,6 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** CreateWorkspaceProblemRequest */
-        CreateWorkspaceProblemRequest: {
-            /** @description 문제 ID */
-            problemId: number;
-            /** @description 마감일 */
-            deadline?: (never | string) | null;
-            /** @description 예정일 */
-            scheduledAt?: (never | string) | null;
-        };
         /** SolutionIngestRequest */
         SolutionIngestRequest: {
             /** @description 백준 제출 번호 */
@@ -1515,12 +1540,14 @@ export interface components {
             /** @description 워크스페이스 문제 ID */
             workspaceProblemId: number;
         };
-        /** WorkspaceImageUploadRequest */
-        WorkspaceImageUploadRequest: {
-            /** @description 파일 크기 (바이트, 최대 5MB) */
-            fileSize: number;
-            /** @description 이미지 Content-Type (image/jpeg, image/png, image/webp) */
-            contentType: string;
+        /** CreateWorkspaceProblemRequest */
+        CreateWorkspaceProblemRequest: {
+            /** @description 문제 ID */
+            problemId: number;
+            /** @description 마감일 */
+            deadline?: (never | string) | null;
+            /** @description 예정일 */
+            scheduledAt?: (never | string) | null;
         };
         /** ApiResponse-Comment */
         "ApiResponse-Comment": {
@@ -1530,6 +1557,13 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
+        };
+        /** WorkspaceImageUploadRequest */
+        WorkspaceImageUploadRequest: {
+            /** @description 파일 크기 (바이트, 최대 5MB) */
+            fileSize: number;
+            /** @description 이미지 Content-Type (image/jpeg, image/png, image/webp) */
+            contentType: string;
         };
         /** CreateBoardRequest */
         CreateBoardRequest: {
@@ -1696,6 +1730,11 @@ export interface components {
             /** @description 리프레시 토큰 */
             refreshToken: string;
         };
+        /** CreateCommentRequest */
+        CreateCommentRequest: {
+            /** @description 댓글 내용 */
+            content: string;
+        };
         /** ApiResponse-WorkspaceDashboardResponse */
         "ApiResponse-WorkspaceDashboardResponse": {
             /** @description 응답 데이터 */
@@ -1795,11 +1834,6 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
-        };
-        /** CreateCommentRequest */
-        CreateCommentRequest: {
-            /** @description 댓글 내용 */
-            content: string;
         };
         /** UpdateWorkspaceMemberRoleRequest */
         UpdateWorkspaceMemberRoleRequest: {
@@ -1998,20 +2032,6 @@ export interface components {
             /** @description HTTP 상태 코드 */
             status: number;
         };
-        /** ApiResponse-SolutionLikeStatus */
-        "ApiResponse-SolutionLikeStatus": {
-            /** @description 응답 데이터 */
-            data: {
-                /** @description 내 좋아요 여부 */
-                isLiked: boolean;
-                /** @description 좋아요 수 */
-                likes: number;
-            };
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
-        };
         /** ApiResponse-WorkspaceProblemResponse */
         "ApiResponse-WorkspaceProblemResponse": {
             /** @description 응답 데이터 */
@@ -2036,6 +2056,20 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
+        /** ApiResponse-SolutionLikeStatus */
+        "ApiResponse-SolutionLikeStatus": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 내 좋아요 여부 */
+                isLiked: boolean;
+                /** @description 좋아요 수 */
+                likes: number;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
         /** ProblemDetail-InvalidParameter */
         "ProblemDetail-InvalidParameter": {
             /** @description 예외 클래스명 */
@@ -2052,20 +2086,6 @@ export interface components {
             timestamp: string;
             /** @description HTTP 상태 코드 */
             status: number;
-        };
-        /** ApiResponse-PresignedUrlResponse */
-        "ApiResponse-PresignedUrlResponse": {
-            /** @description 응답 데이터 */
-            data: {
-                /** @description 업로드 완료 후 이미지 접근 URL */
-                imageUrl: string;
-                /** @description S3 업로드용 Presigned URL */
-                presignedUrl: string;
-            };
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
         };
         /** ApiResponse-ProblemBoxResponse */
         "ApiResponse-ProblemBoxResponse": {
@@ -2135,6 +2155,13 @@ export interface components {
                 /** @description 태그 이름 */
                 name: string;
             }[];
+        };
+        /** BoardImageUploadRequest */
+        BoardImageUploadRequest: {
+            /** @description 파일 크기 (바이트, 최대 5MB) */
+            fileSize: number;
+            /** @description 이미지 Content-Type (image/jpeg, image/png, image/webp) */
+            contentType: string;
         };
         /** UserUpdateRequest */
         UserUpdateRequest: {
@@ -3356,6 +3383,33 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetail-Validation"];
+                };
+            };
+        };
+    };
+    "board-create-image-presigned-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json;charset=UTF-8": components["schemas"]["BoardImageUploadRequest"];
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-PresignedUrlResponse"];
                 };
             };
         };
