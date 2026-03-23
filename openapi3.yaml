@@ -5,6 +5,8 @@ info:
   version: 0.0.1-SNAPSHOT
 servers:
 - url: http://localhost:8080
+security:
+- bearerAuth: []
 tags: []
 paths:
   /api/v1/workspaces:
@@ -3811,6 +3813,12 @@ paths:
                       "message" : null
                     }
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "로그인 후 받은 accessToken을 입력하세요"
   schemas:
     ProblemDetail-Forbidden:
       title: ProblemDetail-Forbidden
