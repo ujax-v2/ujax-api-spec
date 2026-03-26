@@ -300,26 +300,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/me/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 내 프로필 대시보드 조회
-         * @description 로그인한 사용자의 프로필 대시보드 통계를 조회합니다
-         */
-        get: operations["user-get-my-profile"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/workspaces/{workspaceId}/boards": {
         parameters: {
             query?: never;
@@ -466,26 +446,6 @@ export interface paths {
          * @description S3에 프로필 이미지를 업로드하기 위한 Presigned URL을 생성합니다. JPEG, PNG, WEBP만 허용되며 최대 5MB입니다.
          */
         post: operations["user-create-profile-image-presigned-url"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/profile/activity": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 내 프로필 활동 기록 조회
-         * @description 로그인한 사용자의 일자별 문제 해결 활동 기록을 조회합니다
-         */
-        get: operations["user-get-my-profile-activity"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -808,6 +768,26 @@ export interface paths {
         patch: operations["workspace-member-nickname-update"];
         trace?: never;
     };
+    "/api/v1/workspaces/{workspaceId}/members/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 내 워크스페이스 멤버 프로필 대시보드 조회
+         * @description 현재 워크스페이스에서 로그인한 사용자의 멤버 프로필 통계를 조회합니다
+         */
+        get: operations["workspace-member-profile-me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/workspaces/{workspaceId}/members/{workspaceMemberId}/role": {
         parameters: {
             query?: never;
@@ -887,6 +867,26 @@ export interface paths {
          * @description 게시글 댓글을 삭제합니다
          */
         delete: operations["board-comment-delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspaceId}/members/me/profile/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 내 워크스페이스 멤버 활동 기록 조회
+         * @description 현재 워크스페이스에서 로그인한 사용자의 일자별 문제 해결 활동 기록을 조회합니다
+         */
+        get: operations["workspace-member-profile-activity-me"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1209,15 +1209,6 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** ApiResponse-BoardList */
-        "ApiResponse-BoardList": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
-        };
         /** ApiResponse-WorkspaceSettings */
         "ApiResponse-WorkspaceSettings": {
             /** @description 응답 데이터 */
@@ -1233,6 +1224,15 @@ export interface components {
                 /** @description Hook URL */
                 hookUrl?: string | null;
             };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
+        /** ApiResponse-BoardList */
+        "ApiResponse-BoardList": {
+            /** @description 응답 데이터 */
+            data: Record<string, never>;
             /** @description 성공 여부 */
             success: boolean;
             /** @description 메시지 */
@@ -1259,6 +1259,13 @@ export interface components {
             /** @description 예정일 */
             scheduledAt?: (never | string) | null;
         };
+        /** CreateWorkspaceRequest */
+        CreateWorkspaceRequest: {
+            /** @description 워크스페이스 이름 */
+            name: string;
+            /** @description 워크스페이스 설명 */
+            description?: string | null;
+        };
         /** ProblemDetail-NotFound */
         "ProblemDetail-NotFound": {
             /** @description 예외 클래스명 */
@@ -1275,13 +1282,6 @@ export interface components {
             timestamp: string;
             /** @description HTTP 상태 코드 */
             status: number;
-        };
-        /** CreateWorkspaceRequest */
-        CreateWorkspaceRequest: {
-            /** @description 워크스페이스 이름 */
-            name: string;
-            /** @description 워크스페이스 설명 */
-            description?: string | null;
         };
         /** SignupRequest */
         SignupRequest: {
@@ -1357,18 +1357,6 @@ export interface components {
             /** @description Hook URL */
             hookUrl?: string | null;
         };
-        /** UpdateWorkspaceMemberNicknameRequest */
-        UpdateWorkspaceMemberNicknameRequest: {
-            /** @description 닉네임 */
-            nickname: string;
-        };
-        /** CreateProblemBoxRequest */
-        CreateProblemBoxRequest: {
-            /** @description 문제집 설명 */
-            description?: string | null;
-            /** @description 문제집 제목 */
-            title: string;
-        };
         /** ApiResponse-SubmissionResponse */
         "ApiResponse-SubmissionResponse": {
             /** @description 응답 데이터 */
@@ -1380,6 +1368,18 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
+        };
+        /** CreateProblemBoxRequest */
+        CreateProblemBoxRequest: {
+            /** @description 문제집 설명 */
+            description?: string | null;
+            /** @description 문제집 제목 */
+            title: string;
+        };
+        /** UpdateWorkspaceMemberNicknameRequest */
+        UpdateWorkspaceMemberNicknameRequest: {
+            /** @description 닉네임 */
+            nickname: string;
         };
         /** ApiResponse-PresignedUrlResponse */
         "ApiResponse-PresignedUrlResponse": {
@@ -1467,31 +1467,6 @@ export interface components {
             description?: string | null;
             /** @description 문제집 제목 */
             title: string;
-        };
-        /** ApiResponse-UserProfileActivityResponse */
-        "ApiResponse-UserProfileActivityResponse": {
-            /** @description 응답 데이터 */
-            data: {
-                /** @description 조회 모드 (RECENT 또는 YEAR) */
-                mode: string;
-                /** @description 조회 종료일 */
-                endDate: string;
-                /** @description 조회 연도 */
-                year?: number | null;
-                /** @description 활동이 있었던 날짜 목록 */
-                days: {
-                    /** @description 활동 날짜 */
-                    date: string;
-                    /** @description 해당 날짜 해결 수 */
-                    count: number;
-                }[];
-                /** @description 조회 시작일 */
-                startDate: string;
-            };
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
         };
         /** ApiResponse-Void */
         "ApiResponse-Void": {
@@ -1705,69 +1680,6 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** ApiResponse-UserProfileResponse */
-        "ApiResponse-UserProfileResponse": {
-            /** @description 응답 데이터 */
-            data: {
-                /** @description 요약 정보 */
-                summary: {
-                    /** @description 현재 스트릭 일수 */
-                    streakDays: number;
-                    /** @description 해결한 문제 수 */
-                    solvedCount: number;
-                    /** @description 주력 알고리즘 */
-                    mainAlgorithm?: string | null;
-                    /** @description 주력 언어 */
-                    mainLanguage?: string | null;
-                };
-                /** @description 알고리즘 통계 */
-                algorithmStats: {
-                    /** @description 알고리즘별 해결 수 */
-                    count: number;
-                    /** @description 알고리즘 이름 */
-                    name: string;
-                    /** @description 알고리즘 비율 */
-                    ratio: number;
-                }[];
-                /** @description 언어 통계 */
-                languageStats: {
-                    /** @description 언어별 제출 수 */
-                    count: number;
-                    /** @description 언어 이름 */
-                    name: string;
-                    /** @description 언어 비율 */
-                    ratio: number;
-                }[];
-                /** @description 정답률 정보 */
-                accuracy: {
-                    /** @description 정답 제출 수 */
-                    acceptedCount: number;
-                    /** @description 정답률(%) */
-                    rate: number;
-                    /** @description 전체 제출 수 */
-                    totalCount: number;
-                };
-                /** @description 기본 사용자 정보 */
-                user: {
-                    /** @description 가입일 */
-                    joinedAt: string;
-                    /** @description 이름 */
-                    name: string;
-                    /** @description 백준 아이디 */
-                    baekjoonId?: string | null;
-                    /** @description 유저 ID */
-                    id: number;
-                    /** @description 프로필 이미지 URL */
-                    profileImageUrl?: string | null;
-                    /** @description 이메일 */
-                    email: string;
-                };
-            };
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
-        };
         /** ApiResponse-WorkspaceExplore */
         "ApiResponse-WorkspaceExplore": {
             /** @description 응답 데이터 */
@@ -1857,6 +1769,11 @@ export interface components {
         RefreshRequest: {
             /** @description 리프레시 토큰 */
             refreshToken: string;
+        };
+        /** CreateCommentRequest */
+        CreateCommentRequest: {
+            /** @description 댓글 내용 */
+            content: string;
         };
         /** ApiResponse-WorkspaceDashboardResponse */
         "ApiResponse-WorkspaceDashboardResponse": {
@@ -1958,10 +1875,70 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** CreateCommentRequest */
-        CreateCommentRequest: {
-            /** @description 댓글 내용 */
-            content: string;
+        /** ApiResponse-WorkspaceMemberProfileResponse */
+        "ApiResponse-WorkspaceMemberProfileResponse": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 요약 정보 */
+                summary: {
+                    /** @description 현재 스트릭 일수 */
+                    streakDays: number;
+                    /** @description 해결한 문제 수 */
+                    solvedCount: number;
+                    /** @description 주력 알고리즘 */
+                    mainAlgorithm?: string | null;
+                    /** @description 주력 언어 */
+                    mainLanguage?: string | null;
+                };
+                /** @description 알고리즘 통계 */
+                algorithmStats: {
+                    /** @description 알고리즘별 해결 수 */
+                    count: number;
+                    /** @description 알고리즘 이름 */
+                    name: string;
+                    /** @description 알고리즘 비율 */
+                    ratio: number;
+                }[];
+                /** @description 언어 통계 */
+                languageStats: {
+                    /** @description 언어별 제출 수 */
+                    count: number;
+                    /** @description 언어 이름 */
+                    name: string;
+                    /** @description 언어 비율 */
+                    ratio: number;
+                }[];
+                /** @description 워크스페이스 멤버 정보 */
+                member: {
+                    /** @description 워크스페이스 권한 */
+                    role: string;
+                    /** @description 워크스페이스 가입일 */
+                    joinedAt: string;
+                    /** @description 워크스페이스 닉네임 */
+                    nickname: string;
+                    /** @description 백준 아이디 */
+                    baekjoonId?: string | null;
+                    /** @description 프로필 이미지 URL */
+                    profileImageUrl?: string | null;
+                    /** @description 사용자 이메일 */
+                    email: string;
+                    /** @description 워크스페이스 멤버 ID */
+                    workspaceMemberId: number;
+                };
+                /** @description 정답률 정보 */
+                accuracy: {
+                    /** @description 정답 제출 수 */
+                    acceptedCount: number;
+                    /** @description 정답률(%) */
+                    rate: number;
+                    /** @description 전체 제출 수 */
+                    totalCount: number;
+                };
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
         };
         /** UpdateWorkspaceMemberRoleRequest */
         UpdateWorkspaceMemberRoleRequest: {
@@ -1992,6 +1969,31 @@ export interface components {
             type?: string | null;
             /** @description 내용 */
             content?: string | null;
+        };
+        /** ApiResponse-WorkspaceMemberProfileActivityResponse */
+        "ApiResponse-WorkspaceMemberProfileActivityResponse": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 조회 모드 (RECENT 또는 YEAR) */
+                mode: string;
+                /** @description 조회 종료일 */
+                endDate: string;
+                /** @description 조회 연도 */
+                year?: number | null;
+                /** @description 활동이 있었던 날짜 목록 */
+                days: {
+                    /** @description 활동 날짜 */
+                    date: string;
+                    /** @description 해당 날짜 해결 수 */
+                    count: number;
+                }[];
+                /** @description 조회 시작일 */
+                startDate: string;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
         };
         "api-v1-workspaces-workspaceId-problem-boxes-problemBoxId-problems-workspaceProblemId-solution-members-workspaceMemberId-submissions-submissionId-comments-1563718501": {
             /** @description 댓글 내용 */
@@ -2802,26 +2804,6 @@ export interface operations {
             };
         };
     };
-    "user-get-my-profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiResponse-UserProfileResponse"];
-                };
-            };
-        };
-    };
     "board-list": {
         parameters: {
             query?: {
@@ -3139,29 +3121,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiResponse-PresignedUrlResponse"];
-                };
-            };
-        };
-    };
-    "user-get-my-profile-activity": {
-        parameters: {
-            query?: {
-                /** @description 조회 연도. 없으면 최근 365일을 반환 */
-                year?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiResponse-UserProfileActivityResponse"];
                 };
             };
         };
@@ -3852,6 +3811,29 @@ export interface operations {
             };
         };
     };
+    "workspace-member-profile-me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-WorkspaceMemberProfileResponse"];
+                };
+            };
+        };
+    };
     "workspace-member-role-update": {
         parameters: {
             query?: never;
@@ -4046,6 +4028,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiResponse-Void"];
+                };
+            };
+        };
+    };
+    "workspace-member-profile-activity-me": {
+        parameters: {
+            query?: {
+                /** @description 조회 연도. 없으면 최근 365일을 반환 */
+                year?: string;
+            };
+            header?: never;
+            path: {
+                /** @description 워크스페이스 ID */
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponse-WorkspaceMemberProfileActivityResponse"];
                 };
             };
         };
