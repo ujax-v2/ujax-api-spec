@@ -1,6 +1,6 @@
 {
   "name": "@ujax/api-spec",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ujax API OpenAPI 스펙 및 TypeScript 타입",
   "main": "index.js",
   "types": "types.ts",
