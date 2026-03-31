@@ -1359,14 +1359,12 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** ApiResponse-BoardList */
-        "ApiResponse-BoardList": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
+        /** UpdateWorkspaceProblemRequest */
+        UpdateWorkspaceProblemRequest: {
+            /** @description 마감일 */
+            deadline?: (never | string) | null;
+            /** @description 예정일 */
+            scheduledAt?: (never | string) | null;
         };
         /** ApiResponse-AuthTokenResponse */
         "ApiResponse-AuthTokenResponse": {
@@ -1381,13 +1379,6 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
-        };
-        /** UpdateWorkspaceProblemRequest */
-        UpdateWorkspaceProblemRequest: {
-            /** @description 마감일 */
-            deadline?: (never | string) | null;
-            /** @description 예정일 */
-            scheduledAt?: (never | string) | null;
         };
         /** ApiResponse-WorkspaceSettings */
         "ApiResponse-WorkspaceSettings": {
@@ -1514,17 +1505,17 @@ export interface components {
             /** @description Hook URL */
             hookUrl?: string | null;
         };
+        /** UpdateWorkspaceMemberNicknameRequest */
+        UpdateWorkspaceMemberNicknameRequest: {
+            /** @description 닉네임 */
+            nickname: string;
+        };
         /** CreateProblemBoxRequest */
         CreateProblemBoxRequest: {
             /** @description 문제집 설명 */
             description?: string | null;
             /** @description 문제집 제목 */
             title: string;
-        };
-        /** UpdateWorkspaceMemberNicknameRequest */
-        UpdateWorkspaceMemberNicknameRequest: {
-            /** @description 닉네임 */
-            nickname: string;
         };
         /** ApiResponse-SubmissionResponse */
         "ApiResponse-SubmissionResponse": {
@@ -1734,10 +1725,60 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
-        /** ApiResponse-CommentList */
-        "ApiResponse-CommentList": {
+        /** ApiResponse-BoardList */
+        "ApiResponse-BoardList": {
             /** @description 응답 데이터 */
-            data: Record<string, never>;
+            data: {
+                /** @description 페이지 정보 */
+                page: {
+                    /** @description 마지막 페이지 여부 */
+                    last: boolean;
+                    /** @description 페이지 크기 */
+                    size: number;
+                    /** @description 전체 페이지 수 */
+                    totalPages: number;
+                    /** @description 페이지 번호 */
+                    page: number;
+                    /** @description 첫 페이지 여부 */
+                    first: boolean;
+                    /** @description 전체 요소 수 */
+                    totalElements: number;
+                };
+                /** @description 게시글 목록 */
+                items: {
+                    /** @description 내용 미리보기 */
+                    preview: string;
+                    /** @description 고정 여부 */
+                    pinned: boolean;
+                    /** @description 작성자 정보 */
+                    author: {
+                        /** @description 작성자 닉네임 */
+                        nickname: string;
+                        /** @description 워크스페이스 멤버 ID */
+                        workspaceMemberId: number;
+                    };
+                    /** @description 좋아요 수 */
+                    likeCount: number;
+                    /** @description 제목 */
+                    title: string;
+                    /** @description 게시글 타입 */
+                    type: string;
+                    /** @description 내 좋아요 여부 */
+                    myLike: boolean;
+                    /** @description 댓글 수 */
+                    commentCount: number;
+                    /** @description 생성 시각 */
+                    createdAt: string;
+                    /** @description 게시글 ID */
+                    boardId: number;
+                    /** @description 조회 수 */
+                    viewCount: number;
+                    /** @description 수정 시각 */
+                    updatedAt: string;
+                    /** @description 워크스페이스 ID */
+                    workspaceId: number;
+                }[];
+            };
             /** @description 성공 여부 */
             success: boolean;
             /** @description 메시지 */
@@ -1777,15 +1818,6 @@ export interface components {
             fileSize: number;
             /** @description 이미지 Content-Type (image/jpeg, image/png, image/webp) */
             contentType: string;
-        };
-        /** ApiResponse-Comment */
-        "ApiResponse-Comment": {
-            /** @description 응답 데이터 */
-            data: Record<string, never>;
-            /** @description 성공 여부 */
-            success: boolean;
-            /** @description 메시지 */
-            message?: string | null;
         };
         /** CreateBoardRequest */
         CreateBoardRequest: {
@@ -2041,6 +2073,49 @@ export interface components {
             /** @description 메시지 */
             message?: string | null;
         };
+        /** ApiResponse-CommentList */
+        "ApiResponse-CommentList": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 페이지 정보 */
+                page: {
+                    /** @description 마지막 페이지 여부 */
+                    last: boolean;
+                    /** @description 페이지 크기 */
+                    size: number;
+                    /** @description 전체 페이지 수 */
+                    totalPages: number;
+                    /** @description 페이지 번호 */
+                    page: number;
+                    /** @description 첫 페이지 여부 */
+                    first: boolean;
+                    /** @description 전체 요소 수 */
+                    totalElements: number;
+                };
+                /** @description 댓글 목록 */
+                items: {
+                    /** @description 댓글 ID */
+                    boardCommentId: number;
+                    /** @description 생성 시각 */
+                    createdAt: string;
+                    /** @description 작성자 정보 */
+                    author: {
+                        /** @description 작성자 닉네임 */
+                        nickname: string;
+                        /** @description 워크스페이스 멤버 ID */
+                        workspaceMemberId: number;
+                    };
+                    /** @description 게시글 ID */
+                    boardId: number;
+                    /** @description 댓글 내용 */
+                    content: string;
+                }[];
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
+        };
         /** UpdateBoardRequest */
         UpdateBoardRequest: {
             /** @description 고정 여부 */
@@ -2168,10 +2243,26 @@ export interface components {
             /** @description 이메일 */
             email: string;
         };
-        /** ApiResponse-BoardDetail */
-        "ApiResponse-BoardDetail": {
+        /** ApiResponse-Comment */
+        "ApiResponse-Comment": {
             /** @description 응답 데이터 */
-            data: Record<string, never>;
+            data: {
+                /** @description 댓글 ID */
+                boardCommentId: number;
+                /** @description 생성 시각 */
+                createdAt: string;
+                /** @description 작성자 정보 */
+                author: {
+                    /** @description 작성자 닉네임 */
+                    nickname: string;
+                    /** @description 워크스페이스 멤버 ID */
+                    workspaceMemberId: number;
+                };
+                /** @description 게시글 ID */
+                boardId: number;
+                /** @description 댓글 내용 */
+                content: string;
+            };
             /** @description 성공 여부 */
             success: boolean;
             /** @description 메시지 */
@@ -2191,11 +2282,6 @@ export interface components {
             /** @description 프로그래밍 언어 */
             language: string;
         };
-        /** SignupResendRequest */
-        SignupResendRequest: {
-            /** @description 회원가입 요청 토큰 */
-            requestToken: string;
-        };
         /** ApiResponse-WorkspaceMemberResponse */
         "ApiResponse-WorkspaceMemberResponse": {
             /** @description 응답 데이터 */
@@ -2211,6 +2297,11 @@ export interface components {
             success: boolean;
             /** @description 메시지 */
             message?: string | null;
+        };
+        /** SignupResendRequest */
+        SignupResendRequest: {
+            /** @description 회원가입 요청 토큰 */
+            requestToken: string;
         };
         /** InviteWorkspaceMemberRequest */
         InviteWorkspaceMemberRequest: {
@@ -2415,6 +2506,47 @@ export interface components {
                 /** @description 태그 이름 */
                 name: string;
             }[];
+        };
+        /** ApiResponse-BoardDetail */
+        "ApiResponse-BoardDetail": {
+            /** @description 응답 데이터 */
+            data: {
+                /** @description 고정 여부 */
+                pinned: boolean;
+                /** @description 작성자 정보 */
+                author: {
+                    /** @description 작성자 닉네임 */
+                    nickname: string;
+                    /** @description 워크스페이스 멤버 ID */
+                    workspaceMemberId: number;
+                };
+                /** @description 좋아요 수 */
+                likeCount: number;
+                /** @description 제목 */
+                title: string;
+                /** @description 게시글 타입 */
+                type: string;
+                /** @description 내 좋아요 여부 */
+                myLike: boolean;
+                /** @description 내용 */
+                content: string;
+                /** @description 댓글 수 */
+                commentCount: number;
+                /** @description 생성 시각 */
+                createdAt: string;
+                /** @description 게시글 ID */
+                boardId: number;
+                /** @description 조회 수 */
+                viewCount: number;
+                /** @description 수정 시각 */
+                updatedAt: string;
+                /** @description 워크스페이스 ID */
+                workspaceId: number;
+            };
+            /** @description 성공 여부 */
+            success: boolean;
+            /** @description 메시지 */
+            message?: string | null;
         };
         /** BoardImageUploadRequest */
         BoardImageUploadRequest: {
